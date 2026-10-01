@@ -1,207 +1,302 @@
-# TASK — DevSopByAi CodeGraph Controlled Repository-Navigation A/B Benchmark
+# TASK CONTRACT — DevSopByAi CodeGraph Controlled Repository-Navigation A/B Benchmark
 
 ## METADATA
 
 - TASK_ID: DEVSOP-CODEXC-CODEGRAPH-AB-2026-10-01
-- CONTRACT_VERSION: 1.0
+- TASK_NAME: DevSopByAi CodeGraph Controlled Repository-Navigation A/B Benchmark
+- CONTRACT_VERSION: 2.0
 - STATUS: READY
-- IDENTITY: CodexC — Experiment Operator / Benchmark Orchestrator
+- ASSIGNEE_IDENTITY: CodexC
+- ASSIGNEE_ROLE: Experiment Operator / Benchmark Orchestrator
 - TASK_PATH: docs/tasks/DEVSOPBYAI-CODEXC-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-01.md
-- TASK_DEFINITION_BASE_HEAD: d51707594fff031cd54eace025b2b2ffff883f85
-- TARGET: DevSopByAi working tree containing this TaskContract
-- TASK_CLASS: Controlled read-only repository-navigation benchmark
-- ESTIMATED_RUNTIME: 90–150 minutes typical
-- EXECUTION_MODE: unattended-capable; serial orchestration of fresh child Codex sessions
-- CONTRACT_IMMUTABILITY: Do not rewrite this contract, benchmark count, arm definitions, acceptance criteria, or failure policy during execution.
+- CREATED_FROM_HEAD: 9f5d1701854428a3ee0f20c6eff8021f139abdd0
+- TARGET_REPOSITORY: the DevSopByAi working tree in which this TaskContract is present
+- TASK_CLASS: controlled read-only repository-navigation benchmark
+- CONTRACT_IMMUTABLE: true
+- PHASE: 1 — repository understanding / navigation only
+
+This file is the Layer-B TaskContract and is the sole execution authority for CodexC.
+Chat text and launch prompts are only locators. If chat text conflicts with this file, this file wins.
+
+## EXECUTION PROFILE
+
+- OPERATOR: CodexC
+- OPERATOR_MODE: orchestrator, not benchmark subject
+- RECOMMENDED_REASONING: high
+- EXPECTED_RUNTIME: 90–150 minutes typical
+- UNATTENDED_EXECUTION: allowed
+- MEASURED_SUBJECT_SESSIONS: 16
+- BENCHMARK_COUNT: 4
+- REPEATS_PER_BENCHMARK: 2
+- ARMS: A = baseline Codex navigation; B = CodeGraph-assisted Codex navigation
+- VALIDATION: independent and blinded
+- SOURCE_MUTATION_DURING_MEASUREMENT: forbidden
+- PHASE_2_PATCHING: out of scope
+
+For all measured Arm-A and Arm-B child sessions, use the exact same Codex model, reasoning/effort setting, frozen benchmark prompt, BENCHMARK_HEAD, timeout policy, and baseline instructions, except for the minimum CodeGraph availability/discovery instruction required for Arm B.
+
+If exact model or metric identity cannot be observed, record UNKNOWN or null. Never guess.
 
 ## GOAL
 
-Determine whether CodeGraph improves Codex repository discovery on the current DevSopByAi repository without reducing correctness or dependency coverage.
+Determine whether CodeGraph is useful as a default repository-discovery layer for Codex on the current DevSopByAi repository.
 
 The experiment must answer:
 
-On the same frozen repository HEAD, with identical benchmark prompts, identical Codex model/reasoning, and fresh isolated contexts, does CodeGraph reduce repository-exploration cost while preserving correctness and dependency completeness?
+> On the same frozen repository HEAD, with identical benchmark prompts and fresh isolated Codex contexts, does CodeGraph reduce repository-exploration cost without reducing correctness or dependency completeness?
 
-Priority order:
+Decision order is fixed:
 
-1. correctness failures;
-2. dependency recall and critical omissions;
-3. tool calls;
-4. unique files opened;
-5. total tokens where observable;
-6. wall-clock time.
+1. correctness;
+2. critical dependency completeness;
+3. unsupported/static-vs-runtime claims;
+4. tool calls;
+5. unique files opened;
+6. token use where observable;
+7. wall-clock time;
+8. CodeGraph setup/index cost.
 
-Correctness is the gate. Efficiency is considered only after correctness.
-
-## CODEXC ROLE
-
-CodexC is the experiment operator, not the benchmark subject.
-
-CodexC must:
-
-- freeze the repository and benchmark environment;
-- choose and freeze benchmark prompts before any measured answer session;
-- launch a fresh child Codex CLI process/session for every measured run;
-- collect machine-readable evidence;
-- launch fresh independent blinded validator session(s);
-- write the final report only after validation.
-
-CodexC must not answer a benchmark itself and then reuse that knowledge in a measured child session.
-
-## MODEL INVARIANTS
-
-For every measured Arm A and Arm B child session:
-
-- exact same model;
-- exact same reasoning/effort setting;
-- exact same frozen benchmark prompt;
-- exact same BENCHMARK_HEAD;
-- same timeout policy;
-- same baseline instructions except the minimum CodeGraph-specific discovery instruction required for Arm B.
-
-Record exact model, reasoning setting, Codex version and environment in manifest.json. If any value cannot be observed reliably, record UNKNOWN; never guess.
+Correctness is a gate. Efficiency cannot compensate for a correctness regression.
 
 ## PRECONDITIONS
 
-Before measurement:
+Before any measured run, CodexC MUST:
 
-1. Confirm this TaskContract is present locally.
-2. Record git rev-parse HEAD, git status --porcelain, git remote -v, and current branch/ref.
-3. Require a clean working tree before benchmark setup.
-4. Define BENCHMARK_HEAD as the exact commit under test after this TaskContract is available locally.
-5. Verify Codex CLI can launch fresh non-resumed child sessions.
-6. Inspect current CodeGraph installation/configuration behavior before making environment changes.
-7. Do not modify DevSopByAi source, tests, schemas, AGENTS instructions, or production configuration during the measured benchmark.
+1. Read this TaskContract in full.
+2. Confirm the current working tree is the intended DevSopByAi repository.
+3. Record:
+   - git rev-parse HEAD
+   - git status --porcelain
+   - git branch --show-current or equivalent detached-ref evidence
+   - git remote -v
+   - Codex CLI version
+4. Require the working tree to be clean before benchmark setup.
+5. Define BENCHMARK_HEAD as the exact commit under test after this TaskContract is present locally.
+6. Verify fresh non-resumed child Codex sessions can be launched.
+7. Verify the measured repository has enough real cross-file structure to support all four benchmark categories below.
+8. Inspect current CodeGraph documentation/help/configuration behavior before changing any environment.
+9. Confirm CodeGraph can be isolated from persistent/global Codex/AGENTS configuration.
+10. Create a dedicated experiment output root:
+    docs/experiments/codegraph-ab-2026-10/
 
-If the current working tree is not a usable DevSopByAi repository, is unexpectedly dirty, or fresh child contexts cannot be isolated, stop as BLOCKED.
+BLOCK before measurement if any of the following is true:
 
-## ARM A — BASELINE
+- this TaskContract cannot be read;
+- the wrong repository is open;
+- the working tree is unexpectedly dirty and cannot be safely explained;
+- fresh child Codex contexts cannot be isolated;
+- the repository is too structurally trivial to form four valid benchmarks;
+- safe CodeGraph isolation cannot be achieved without persistent/global mutation.
 
-CodeGraph must not be available.
+Do not weaken the experiment to avoid BLOCKED status.
 
-Allowed read-only discovery includes source reads, rg/grep, find, Git inspection, and existing repository-native read-only tools.
+## EXACT EXECUTION PLAN
 
-No source modification. No implementation patch.
+### Phase 0 — Freeze execution state
 
-## ARM B — CODEGRAPH
+Create manifest.json containing at minimum:
 
-CodeGraph is enabled as an MCP/discovery layer.
+- TASK_ID
+- CONTRACT_VERSION
+- BENCHMARK_HEAD
+- repository path
+- branch/ref
+- initial git status
+- Codex version
+- measured Codex model
+- reasoning/effort setting
+- host/OS summary
+- CodeGraph version once known
+- planned run matrix
+- start timestamp
 
-Use CodeGraph-first discovery, but allow source reads, rg, Git, tests, and other read-only confirmation when needed to verify:
+After BENCHMARK_HEAD is frozen, every measured child session MUST operate on that same commit via disposable clean worktree/snapshot.
 
-- critical dependency edges;
-- dynamic/runtime-only behavior;
-- macro/framework/plugin behavior;
-- uncertain CodeGraph results.
+### Phase 1 — Inspect and isolate CodeGraph
 
-Do not instruct the child agent to trust CodeGraph blindly.
-
-No source modification. No implementation patch.
-
-The comparison is normal Codex exploration versus Codex with CodeGraph available as a preferred discovery layer. It is not a CodeGraph-only versus grep-only contest.
-
-## CODEGRAPH ISOLATION RULES
-
-Do not run a global installer blindly.
-
-Preflight should inspect current official/current command behavior, including codegraph version/help/install help where applicable.
+Inspect current CodeGraph CLI/help/documentation and establish the least-invasive integration method.
 
 Requirements:
 
-- do not modify repository AGENTS.md or equivalent instruction files;
-- do not modify persistent/global Codex instructions;
+- do not run a global installer blindly;
+- do not edit repository AGENTS.md or equivalent instruction files;
+- do not edit persistent/global Codex instructions;
+- do not change production DevSopByAi configuration;
 - do not commit .codegraph;
-- do not modify production DevSopByAi config;
-- prefer a documented temporary/per-run MCP configuration;
-- disable telemetry for the experiment where supported;
-- do not copy/expose credentials merely to manufacture an isolated HOME;
-- if safe per-run isolation cannot be achieved without persistent/global mutation, mark Arm B BLOCKED rather than mutating the global environment.
+- prefer temporary/per-run MCP configuration or another documented isolated method;
+- disable telemetry where supported;
+- do not copy credentials/tokens into temporary homes merely to make the test work.
 
-Record exact CodeGraph version, installation source/method, index command, index wall time, index result, and index size if observable.
+Record:
 
-## BENCHMARK DESIGN
+- exact CodeGraph version;
+- install/source method;
+- configuration method;
+- index command;
+- index start/end time;
+- setup/index wall time;
+- setup/index status;
+- index size if observable.
 
-Phase 1 is read-only repository understanding. Do not use real implementation/patch tasks.
+CodeGraph setup/index has its own timing and MUST NOT be silently folded into per-query latency.
 
-Freeze exactly four prompts in docs/experiments/codegraph-ab-2026-10/benchmark-prompts.json before the first measured session.
+### Phase 2 — Build and freeze the benchmark set
 
-### Q1 — Entry Point Discovery
+CodexC may inspect source/docs/tests only to choose benchmark targets.
 
-Choose one real core behavior. Ask for the path from a public/CLI/API entry point to the effective executor/handler, including relevant dispatcher/router, loader/parser, executor/handler, result/evidence writer, and important branches where present.
+Freeze exactly four prompts in:
 
-### Q2 — Cross-file Call Chain
+docs/experiments/codegraph-ab-2026-10/benchmark-prompts.json
 
-Choose one real multi-file core behavior such as TaskContract/execution/state/evidence flow. Ask for the complete cross-file call/data path, files and symbols, role of every hop, and distinction between confirmed calls and inferred relationships.
+The four categories are mandatory:
 
-### Q3 — Blast Radius
+#### Q1 — Entry Point Discovery
 
-Choose one real schema/contract/state/evidence field or symbol. Pose a hypothetical read-only change-impact question. Require direct consumers, indirect consumers, tests, parser/serializer/schema users, runtime/validator users, and uncertain/runtime-only dependencies.
+Choose one real core behavior and ask for the complete path from a public/CLI/API entry point to the effective executor/handler.
 
-### Q4 — Dynamic / Recovery Path
+Expected answer dimensions, where present:
 
-Choose one real behavior likely to exercise static-analysis limits, preferably involving subprocess, config-driven dispatch, dynamic import, runtime branching, plugin/extension selection, shell, Git/runtime state, recovery, or unexpected-state handling.
+- entry point;
+- dispatcher/router;
+- loader/parser;
+- executor/handler;
+- result/evidence writer;
+- important condition branches.
 
-Ask for the end-to-end path and require explicit uncertainty where static evidence is insufficient.
+#### Q2 — Cross-file Call/Data Chain
 
-Benchmark constraints:
+Choose one real multi-file core behavior such as contract → execution → state → evidence.
 
-- prompts must be frozen before measured execution;
-- prompts must not reveal expected answers;
-- prompts may not change after the first measured session;
+Require:
+
+- files;
+- symbols;
+- complete cross-file path;
+- role of each hop;
+- confirmed relations separated from inferred relations.
+
+#### Q3 — Blast Radius
+
+Choose one real schema/contract/state/evidence field or symbol and pose a hypothetical read-only change-impact question.
+
+Require:
+
+- direct consumers;
+- indirect consumers;
+- parser/serializer/schema consumers;
+- runtime/validator consumers;
+- relevant tests;
+- uncertain or runtime-only dependencies.
+
+No actual modification is allowed.
+
+#### Q4 — Dynamic / Recovery / Runtime-selected Path
+
+Choose one real behavior that plausibly stresses static analysis, preferably involving one or more of:
+
+- subprocess;
+- runtime branching;
+- config-driven dispatch;
+- dynamic import;
+- plugin/extension selection;
+- shell;
+- Git/runtime state;
+- recovery or unexpected-state handling.
+
+Require an end-to-end explanation and explicit uncertainty wherever static evidence is insufficient.
+
+Benchmark-selection invariants:
+
+- all four prompts are frozen before the first measured session;
+- prompts do not contain expected answers;
+- prompts do not change after measurement starts;
 - do not choose four trivial single-file questions;
 - Q2 and Q3 must require multiple files/symbol relationships;
 - Q4 must intentionally probe a plausible static-analysis weakness.
 
-## RUN MATRIX
+After benchmark-prompts.json is frozen, compute and record its checksum in manifest.json.
 
-Run 4 prompts × 2 repetitions × 2 arms = 16 measured subject sessions.
+### Phase 3 — Prepare the two arms
 
-Every measured session must be:
+#### Arm A — BASELINE
+
+CodeGraph MUST NOT be available to the child session.
+
+Allowed read-only navigation:
+
+- source reads;
+- rg/grep;
+- find;
+- Git inspection;
+- existing repository-native read-only tools.
+
+No source modifications. No implementation patch.
+
+#### Arm B — CODEGRAPH
+
+CodeGraph is available as a preferred discovery layer.
+
+Instruction policy:
+
+- use CodeGraph-first discovery;
+- source/rg/Git/tests/read-only runtime verification remain allowed;
+- critical edges, dynamic behavior, macros/framework magic, plugins, and uncertain results SHOULD be verified from source/runtime evidence;
+- never instruct the subject to trust CodeGraph blindly.
+
+No source modifications. No implementation patch.
+
+This experiment compares normal Codex navigation against Codex with CodeGraph available. It does NOT compare “CodeGraph only” against “grep only”.
+
+### Phase 4 — Execute the measured run matrix
+
+Run exactly:
+
+4 benchmarks × 2 repetitions × 2 arms = 16 measured subject sessions.
+
+Every measured run MUST use:
 
 - a fresh Codex process/session;
-- fresh conversational context;
-- pinned to BENCHMARK_HEAD;
-- same prompt/model/reasoning for corresponding A/B runs;
-- subject to the same timeout.
+- no resumed conversation;
+- the same BENCHMARK_HEAD;
+- the same prompt for matching A/B pairs;
+- the same model/reasoning;
+- the same timeout limits.
 
-No answer or context from one run may be inserted into another.
+No measured answer may be copied into another measured prompt/context.
 
-Balance order to reduce simple warm-cache bias:
+Use this deterministic balanced order unless a recorded infrastructure constraint makes it impossible:
 
-- Q1 R1: A then B
-- Q1 R2: B then A
-- Q2 R1: B then A
-- Q2 R2: A then B
-- Q3 R1: A then B
-- Q3 R2: B then A
-- Q4 R1: B then A
-- Q4 R2: A then B
+- Q1 R1: A → B
+- Q1 R2: B → A
+- Q2 R1: B → A
+- Q2 R2: A → B
+- Q3 R1: A → B
+- Q3 R2: B → A
+- Q4 R1: B → A
+- Q4 R2: A → B
 
-Record actual order and any deviation.
+Record the actual order.
 
-## WORKTREE AND MUTATION CONTROL
+For every measured run:
 
-Use disposable worktrees or equivalent clean snapshots pinned to BENCHMARK_HEAD.
+1. create/reset disposable worktree/snapshot at BENCHMARK_HEAD;
+2. verify clean state before launch;
+3. launch a fresh child Codex session;
+4. capture answer and observable run telemetry;
+5. verify git status after completion;
+6. if repository content changed, preserve evidence and mark PROTOCOL_VIOLATION;
+7. restore only the disposable worktree before continuing.
 
-For every measured session:
+Do not silently “fix” or normalize a violating run.
 
-1. check clean state before launch;
-2. run read-only benchmark;
-3. check git status --porcelain after completion;
-4. if the child changed repository content, preserve evidence, mark the run PROTOCOL_VIOLATION, and restore only the disposable worktree before proceeding.
+### Phase 5 — Capture per-run evidence
 
-The formal repository under test must receive zero unintended benchmark-time mutation.
-
-Only final experiment artifacts required by this contract may be committed after measurement and validation.
-
-## PER-RUN EVIDENCE
-
-Create one JSON record per measured run with these fields:
+Create one JSON record per measured run containing:
 
 - run_id
-- benchmark_id: Q1/Q2/Q3/Q4
-- arm: A/B
-- repeat: 1/2
+- benchmark_id
+- arm
+- repeat
 - benchmark_head
 - model
 - reasoning
@@ -222,73 +317,57 @@ Create one JSON record per measured run with these fields:
 - retrieval_bytes
 - retrieval_tokens
 - answer_file
-- status: COMPLETE/TIMEOUT/ERROR/PROTOCOL_VIOLATION
+- status: COMPLETE | TIMEOUT | ERROR | PROTOCOL_VIOLATION
 - timeout
 - blocked
 - errors
 
-If a metric is not observable, store null. Never estimate unavailable token/tool metrics.
+If a metric is unavailable, store null. Never infer or estimate it.
 
-Do not commit secrets, auth material, or oversized raw traces.
+Preserve only sanitized evidence in Git. Never commit secrets, tokens, auth files, or unnecessary oversized raw traces.
 
-## RETRIEVAL FOOTPRINT
+### Phase 6 — Measure CodeGraph setup and break-even
 
-Where observable, measure both:
+Report separately:
 
-- files explicitly opened/read;
-- context returned by tools in bytes and/or tokens.
+- T_setup = CodeGraph install/config/index preparation wall time;
+- T_query = measured subject query/session time;
+- T_first_use = T_setup + first CodeGraph-use session cost.
 
-Fewer tool calls alone is not sufficient evidence of lower context cost.
-
-If footprint cannot be measured reliably, record null and describe the limitation.
-
-## SETUP COST AND BREAK-EVEN
-
-Measure CodeGraph setup separately.
-
-Record:
-
-- T_setup: first index/setup wall time;
-- T_query: measured query/session time;
-- T_first_use: T_setup plus first CodeGraph query/session cost.
-
-If median per-task wall-time saving is positive, compute a descriptive break-even estimate:
+If median per-task wall-time saving is positive:
 
 break_even_tasks = T_setup / median_wall_time_saved_per_task
 
-If the denominator is zero/negative or data is insufficient, report N/A.
+If the denominator is zero/negative or evidence is insufficient, report N/A.
 
 Report both first-use and steady-state views.
 
-## INDEPENDENT BLINDED VALIDATION
+### Phase 7 — Blind independent validation
 
-After subject runs complete, launch fresh validator session(s).
+After all subject runs are complete:
 
-The validator must not be told which anonymous answer came from Arm A or B.
+1. anonymize corresponding A/B answers as X/Y;
+2. store the arm mapping in arm-map.json;
+3. do NOT expose arm-map.json to validator sessions;
+4. launch fresh independent validator context(s), preferably one per benchmark Q1–Q4;
+5. validators establish ground truth from source, Git, tests, and read-only runtime evidence where appropriate;
+6. CodeGraph output MUST NOT be the sole ground truth for validating CodeGraph.
 
-Create X/Y anonymous labels and keep the arm mapping outside the validator prompt until validation is complete.
-
-Validator ground truth must come from repository source, Git, tests, and read-only runtime evidence as appropriate.
-
-CodeGraph must not be the sole ground truth for validating CodeGraph.
-
-Validate at least:
+Validators must check at minimum:
 
 - cited file exists;
 - cited symbol exists;
 - claimed call/data relation is supported;
 - direct dependencies are not omitted;
-- invented edges are identified;
-- static hypotheses are not mislabeled as runtime truth;
+- invented/unsupported edges are identified;
+- static hypotheses are not presented as runtime truth;
 - runtime/dynamic uncertainty is recognized.
 
-Prefer one fresh validator context per Q1–Q4 where practical.
+After validation is finalized, reveal the arm mapping only for metric aggregation.
 
-## VALIDATION METRICS
+### Phase 8 — Aggregate metrics
 
-Do not use vague 1–10 scores as the primary evidence.
-
-For each answer/run record:
+Primary correctness fields per answer:
 
 - correct factual claims;
 - false factual claims;
@@ -303,21 +382,55 @@ dependency_recall = confirmed_required_dependencies_found / all_validator_confir
 
 claim_precision = correct_claims / (correct_claims + false_claims)
 
-If the denominator cannot be defended, report N/A rather than inventing a score.
+If denominators are not defensible, report N/A.
 
-## DECISION GATES
+Efficiency summary MUST use medians as the primary statistic for:
 
-### Safety Gate
+- tool calls;
+- unique files opened;
+- wall time;
+- total tokens;
+- retrieval footprint where observable.
 
-Arm B must not introduce:
+Means may be supplemental.
+
+Do not claim stable improvement if one extreme benchmark drives the aggregate.
+
+### Phase 9 — Record CodeGraph failure cases
+
+Create:
+
+docs/experiments/codegraph-ab-2026-10/validation/CODEGRAPH_FAILURE_CASES.md
+
+Explicitly track observed:
+
+- missing edge;
+- wrong edge;
+- stale index/edge;
+- dynamic-dispatch miss;
+- macro/framework miss;
+- runtime-only path;
+- retrieval bloat;
+- MCP/config failure;
+- install/index failure.
+
+If none is observed, explicitly write:
+
+No observed failure case in this benchmark.
+
+### Phase 10 — Apply decision gates
+
+#### Safety Gate
+
+Arm B fails the Safety Gate if it introduces any of:
 
 - a new critical correctness failure;
-- a missed validator-confirmed critical dependency attributable to CodeGraph use;
-- an unsupported static relation presented as confirmed runtime truth.
+- a missed validator-confirmed critical dependency attributable to CodeGraph-assisted navigation;
+- an unsupported static relationship presented as confirmed runtime truth.
 
-Any such event must be prominent in the report and prevents unqualified adoption.
+Safety Gate failure prevents unqualified ADOPT.
 
-### Utility Gate
+#### Utility Gate
 
 Only after Safety Gate evaluation compare:
 
@@ -325,165 +438,246 @@ Only after Safety Gate evaluation compare:
 - unique files opened;
 - wall time;
 - total tokens;
-- retrieval footprint.
+- retrieval footprint;
+- setup/index cost;
+- break-even estimate.
 
-Use medians as primary summaries. Means may be supplemental. Do not call improvement stable if one extreme benchmark drives the aggregate.
+### Phase 11 — Produce artifacts and commit
 
-## FAILURE-CASE REPORT
+Required output tree:
 
-Create docs/experiments/codegraph-ab-2026-10/validation/CODEGRAPH_FAILURE_CASES.md.
-
-Track observed:
-
-- missing edge;
-- wrong/stale edge;
-- dynamic-dispatch miss;
-- macro/framework miss;
-- runtime-only path;
-- retrieval bloat;
-- MCP/config failure;
-- installation/index failure.
-
-If none is observed, explicitly write: No observed failure case in this benchmark.
-
-## TIMEOUT / RECOVERY POLICY
-
-Measured subject session:
-
-- soft limit 8 minutes;
-- hard limit 12 minutes.
-
-On hard timeout: terminate, record TIMEOUT, continue.
-
-CodeGraph setup/index hard limit: 20 minutes.
-
-If exceeded: preserve diagnostics, mark Arm B PARTIAL/BLOCKED as appropriate, and continue only with work that remains meaningful.
-
-At most one retry is allowed, and only for a clearly transient infrastructure failure such as process startup or temporary transport failure.
-
-Do not retry because an answer was wrong, CodeGraph returned poor/empty results, logical analysis failed, genuine workload timed out, or a protocol violation occurred.
-
-Record every retry.
-
-## REQUIRED OUTPUT TREE
-
-Create under docs/experiments/codegraph-ab-2026-10:
-
+docs/experiments/codegraph-ab-2026-10/
 - README.md
 - manifest.json
 - benchmark-prompts.json
 - arm-map.json
 - runs/
 - answers/
-- validation/ground-truth.md
-- validation/validation.json
-- validation/CODEGRAPH_FAILURE_CASES.md
+- validation/
+  - ground-truth.md
+  - validation.json
+  - CODEGRAPH_FAILURE_CASES.md
 - metrics.csv
 - FINAL-REPORT.md
 
-Do not expose arm-map.json to validator sessions before validation is complete.
+The final commit MUST contain only permitted experiment artifacts and any necessary task-result metadata.
+
+Do not commit .codegraph.
+
+## SCOPE & FORBIDDEN ACTIONS
+
+### In scope
+
+- read-only repository exploration;
+- isolated CodeGraph setup for the experiment;
+- fresh child Codex session orchestration;
+- blinded validation;
+- metrics and evidence generation;
+- final experiment artifact commit.
+
+### Out of scope
+
+- production implementation changes;
+- bug fixes;
+- refactors;
+- schema changes;
+- test rewrites;
+- Phase-2 patch-generation benchmarking.
+
+### Forbidden
+
+Do NOT:
+
+- modify this TaskContract;
+- alter frozen benchmark prompts after measurement starts;
+- reuse measured conversational contexts;
+- leak one arm’s answer into another arm;
+- globally rewrite Codex/MCP/AGENTS configuration for convenience;
+- commit .codegraph;
+- modify production source/tests;
+- rerun an incorrect answer until it becomes correct;
+- retry a genuine workload timeout merely to improve metrics;
+- fabricate unavailable metrics;
+- use CodeGraph as its own sole validator;
+- hide setup/index cost;
+- delete failure evidence;
+- silently repair protocol violations.
 
 ## ACCEPTANCE CRITERIA
 
-- AC-01: BENCHMARK_HEAD, environment, Codex version, model, reasoning, and CodeGraph version recorded.
-- AC-02: pre/post clean-state evidence exists.
-- AC-03: Q1–Q4 prompts frozen before measured execution and unchanged afterward.
-- AC-04: 16 measured subject-session records exist, including timeout/error records where applicable.
-- AC-05: every measured run used a fresh child Codex context/process.
-- AC-06: corresponding A/B runs used the same HEAD, prompt, model, reasoning, and timeout.
+- AC-01: BENCHMARK_HEAD, repository state, environment, Codex version, model, reasoning, and CodeGraph version are recorded.
+- AC-02: pre-measurement and post-measurement clean-state evidence exists.
+- AC-03: exactly four valid prompts Q1–Q4 were frozen before measured execution and checksum recorded.
+- AC-04: exactly 16 measured subject-session records exist, including timeout/error/protocol-violation records where applicable.
+- AC-05: every measured run used a fresh non-resumed child Codex context/process.
+- AC-06: corresponding A/B runs used the same BENCHMARK_HEAD, prompt, model, reasoning, and timeout.
 - AC-07: Arm A had no CodeGraph access.
-- AC-08: Arm B used isolated CodeGraph integration without persistent/global instruction pollution.
-- AC-09: CodeGraph setup/index time recorded separately.
-- AC-10: no measured child silently modified repository state.
-- AC-11: blinded independent validation performed without using CodeGraph as sole ground truth.
-- AC-12: correctness/dependency results reported before efficiency conclusions.
-- AC-13: medians for tool calls, files opened, wall time, and tokens reported where observable; unavailable metrics explicitly null/N/A.
-- AC-14: CODEGRAPH_FAILURE_CASES.md exists.
-- AC-15: FINAL-REPORT.md states limitations and protocol deviations.
-- AC-16: experiment artifacts committed; .codegraph is not committed.
-- AC-17: formal DevSopByAi source/runtime behavior was not changed by this Phase-1 task.
+- AC-08: Arm B used isolated CodeGraph integration with no persistent/global instruction pollution.
+- AC-09: CodeGraph setup/index time is reported separately from query time.
+- AC-10: no measured child session silently modified repository content.
+- AC-11: validation was independent and blinded, and did not use CodeGraph as sole ground truth.
+- AC-12: correctness/dependency findings precede efficiency conclusions.
+- AC-13: medians for tool calls, unique files opened, wall time, and tokens are reported where observable; unavailable fields are null/N/A.
+- AC-14: retrieval footprint is reported where observable or explicitly marked unavailable.
+- AC-15: CODEGRAPH_FAILURE_CASES.md exists.
+- AC-16: FINAL-REPORT.md includes limitations and protocol deviations.
+- AC-17: .codegraph is not committed.
+- AC-18: production DevSopByAi source/runtime behavior was not changed.
+- AC-19: final experiment artifacts are committed and FINAL_COMMIT is recorded.
+- AC-20: ENGINEERING_DISPOSITION is evidence-based and uses one allowed value.
 
-If a structural precondition prevents fair comparison, return BLOCKED rather than weakening the contract.
+COMPLETE requires all applicable mandatory ACs to PASS.
+If a structural precondition prevents a fair experiment, report BLOCKED rather than weakening an AC.
 
-## FORBIDDEN ACTIONS
+## EXECUTION EVIDENCE
 
-Do not:
+The final artifact set MUST preserve enough evidence to audit and reproduce the experiment:
 
-- modify this TaskContract during execution;
-- change benchmark prompts after measured execution starts;
-- reuse conversational context across measured runs;
-- leak A answers into B prompts or vice versa;
-- ban source verification in Arm B merely to make CodeGraph metrics look better;
-- globally rewrite Codex/MCP/AGENTS config for convenience;
-- commit .codegraph;
-- modify production source/tests;
-- run a Phase-2 implementation benchmark here;
-- rerun incorrect answers until they pass;
-- fabricate unavailable metrics;
-- use CodeGraph to validate itself;
-- hide setup/index cost;
-- delete evidence of failure or protocol violation.
+- Task ID and contract version;
+- BENCHMARK_HEAD;
+- initial/final repository status;
+- CodeGraph setup/version/index evidence;
+- frozen prompt checksum;
+- actual run order;
+- all 16 per-run JSON summaries;
+- all subject answers;
+- anonymous X/Y validation inputs or mappings sufficient to audit blinding;
+- validator ground truth;
+- validation metrics;
+- metrics.csv;
+- failure-case report;
+- changed-files list;
+- FINAL_COMMIT.
+
+Evidence claims must be derived from observed output. Unknown values remain UNKNOWN/null/N/A.
 
 ## UNEXPECTED STATE POLICY
 
 On unexpected state:
 
-1. preserve evidence;
-2. do not silently change the contract;
-3. classify as transient infrastructure, environment incompatibility, benchmark-design invalidity, CodeGraph limitation, Codex limitation, or protocol violation;
-4. continue only if fairness is preserved;
+1. preserve evidence first;
+2. do not modify the contract to make progress easier;
+3. classify the issue as one of:
+   - TRANSIENT_INFRASTRUCTURE
+   - ENVIRONMENT_INCOMPATIBILITY
+   - BENCHMARK_INVALIDITY
+   - CODEGRAPH_LIMITATION
+   - CODEX_LIMITATION
+   - PROTOCOL_VIOLATION
+4. continue only if experimental fairness remains intact;
 5. otherwise stop as PARTIAL or BLOCKED.
 
-If current CodeGraph/Codex CLI behavior differs from assumptions, use current documented behavior while preserving these invariants:
+If current CodeGraph/Codex CLI behavior differs from assumptions in this contract, adapt only the mechanics, not the invariants.
 
-same HEAD; same prompt; fresh context; isolation; no unintended repository mutation; blinded independent validation.
+Non-negotiable invariants:
+
+- same BENCHMARK_HEAD;
+- same frozen prompt for corresponding A/B runs;
+- same measured model/reasoning;
+- fresh context;
+- no unintended source mutation;
+- independent blinded validation;
+- unavailable metrics are not fabricated.
+
+## TIMEOUT / RECOVERY POLICY
+
+Measured child session:
+
+- soft limit: 8 minutes
+- hard limit: 12 minutes
+
+At hard timeout:
+
+- terminate the child;
+- record TIMEOUT;
+- preserve diagnostics;
+- continue to the next scheduled run.
+
+CodeGraph setup/index:
+
+- hard limit: 20 minutes
+
+If setup/index exceeds the hard limit:
+
+- terminate it;
+- preserve diagnostics;
+- mark Arm B PARTIAL or BLOCKED as appropriate;
+- continue only with evidence that remains meaningful.
+
+Retry policy:
+
+- maximum one retry;
+- retry only for a clearly transient infrastructure/transport/process-start failure.
+
+Do NOT retry because:
+
+- an answer is wrong;
+- CodeGraph gives a poor/empty result;
+- logical analysis fails;
+- a genuine workload hits timeout;
+- a protocol violation occurs.
+
+Every retry must be recorded with the reason.
 
 ## FINAL REPORT SCHEMA
 
-FINAL-REPORT.md must include:
+FINAL-REPORT.md MUST contain:
 
-- TASK_ID / CONTRACT_VERSION / STATUS: COMPLETE, PARTIAL, or BLOCKED
-- BENCHMARK_HEAD / FINAL_COMMIT / CHANGED_FILES
-- CODEX_VERSION / MODEL / REASONING
-- CODEGRAPH_VERSION / CODEGRAPH_SETUP_SECONDS
-- benchmark matrix and completed/timeout/error/protocol-violation counts
-- correctness summary
-- dependency recall
-- critical omissions
-- unsupported edges
-- median tool calls
-- median unique files opened
-- median wall seconds
-- median total tokens
-- retrieval footprint
-- first-use view
-- steady-state view
-- break-even tasks
-- CodeGraph failure modes
-- limitations
-- protocol deviations
-- AC-01 through AC-17 as PASS/FAIL/N/A
+- TASK_ID
+- CONTRACT_VERSION
+- STATUS: COMPLETE | PARTIAL | BLOCKED
+- BENCHMARK_HEAD
+- FINAL_COMMIT
+- CHANGED_FILES
+- CODEX_VERSION
+- MODEL
+- REASONING
+- CODEGRAPH_VERSION
+- CODEGRAPH_SETUP_SECONDS
+- BENCHMARK_MATRIX
+- COMPLETED_RUNS
+- TIMEOUT_RUNS
+- ERROR_RUNS
+- PROTOCOL_VIOLATIONS
+- CORRECTNESS_SUMMARY
+- DEPENDENCY_RECALL
+- CRITICAL_OMISSIONS
+- UNSUPPORTED_EDGES
+- MEDIAN_TOOL_CALLS
+- MEDIAN_UNIQUE_FILES_OPENED
+- MEDIAN_WALL_SECONDS
+- MEDIAN_TOTAL_TOKENS
+- RETRIEVAL_FOOTPRINT
+- FIRST_USE_VIEW
+- STEADY_STATE_VIEW
+- BREAK_EVEN_TASKS
+- CODEGRAPH_FAILURE_MODES
+- LIMITATIONS
+- PROTOCOL_DEVIATIONS
+- AC-01 through AC-20 as PASS | FAIL | N/A
 - ENGINEERING_DISPOSITION
 - DISPOSITION_BASIS
 
-ENGINEERING_DISPOSITION must be exactly one of:
+ENGINEERING_DISPOSITION MUST be exactly one of:
 
 - ADOPT
 - ADOPT_WITH_GUARDRAILS
 - DO_NOT_ADOPT
 - INCONCLUSIVE
 
-Disposition definitions:
+Disposition rules:
 
-- ADOPT: Safety Gate passes and utility improvement is consistent enough to justify default discovery use.
-- ADOPT_WITH_GUARDRAILS: useful improvement exists, but source/runtime revalidation is required for critical paths or observed static-analysis gaps.
-- DO_NOT_ADOPT: material correctness regression, critical dependency loss, unacceptable operational cost, or no useful benefit.
+- ADOPT: Safety Gate passes and utility improvement is consistent enough to justify CodeGraph as the default discovery layer.
+- ADOPT_WITH_GUARDRAILS: useful improvement exists, but critical paths require source/runtime revalidation or static-analysis gaps were observed.
+- DO_NOT_ADOPT: material correctness regression, critical dependency loss, unacceptable operational cost, or no meaningful benefit.
 - INCONCLUSIVE: evidence is insufficient or the protocol could not be completed fairly.
 
-## PHASE BOUNDARY
+The final CodexC response to the user MUST be concise and include only:
 
-This task is Phase 1 only: repository navigation and understanding.
-
-Do not perform real implementation patches.
-
-A future Phase 2 may separately test real patch generation, tests, time-to-first-correct-patch, regression, touched files, and ExecutionEvidence.
+- STATUS
+- BENCHMARK_HEAD
+- FINAL_COMMIT
+- changed files
+- AC summary
+- ENGINEERING_DISPOSITION
+- path to FINAL-REPORT.md
