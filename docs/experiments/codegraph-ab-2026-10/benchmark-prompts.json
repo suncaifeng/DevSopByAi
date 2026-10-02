@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "frozen_at_utc": "2026-10-02T03:10:30Z",
+  "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+  "common_instructions": "You are analyzing this read-only repository at the current commit. Do not modify files or run tests. Use only repository evidence. Cite relevant paths, symbols, and line numbers. Separate source-confirmed relations from inferences, and state uncertainty where evidence is insufficient.",
+  "arm_instructions": {
+    "A": "",
+    "B": "Use CodeGraph-first discovery, then verify critical, dynamic, or uncertain claims against source, rg, Git, or read-only runtime evidence. Do not trust CodeGraph blindly."
+  },
+  "benchmarks": [
+    {
+      "benchmark_id": "Q1",
+      "category": "Entry Point Discovery",
+      "prompt": "Trace the repository's core orchestration behavior from the public call site through validation, dispatch to the execution adapter, subprocess invocation, result and evidence capture, and the route or exit decision. Identify each responsible entry point, symbol, and file, and explain important condition branches. If a CLI/API wrapper is absent or direct execution is intentionally disabled, state that and identify the actual public call path."
+    },
+    {
+      "benchmark_id": "Q2",
+      "category": "Cross-file Call/Data Chain",
+      "prompt": "Trace one failed Codex execution from the validated ExecutionInput through subprocess execution and ExecutionResult construction into orchestrator state/history and the final route decision, including retry or repair counters when applicable. List the complete cross-file symbol path and the role of each hop. Separate relations directly supported by source from inferred/runtime-dependent relations."
+    },
+    {
+      "benchmark_id": "Q3",
+      "category": "Blast Radius",
+      "prompt": "Assume a read-only proposed change adds the ExecutionErrorType literal MCP_START_ERROR. Map its direct and indirect change-impact surface across type declarations, result validation, error classification, routing, orchestration, serializers/parsers, schemas, tests, and documentation where present. Identify relevant consumers and branches, say explicitly where expected files or consumers are absent, and distinguish confirmed dependencies from uncertain or runtime-only ones. Do not make the change."
+    },
+    {
+      "benchmark_id": "Q4",
+      "category": "Dynamic / Recovery / Runtime-selected Path",
+      "prompt": "Trace how a configured timeout for the Codex subprocess flows from ExecutionInput metadata through timeout selection, subprocess.run, TimeoutExpired handling, ExecutionResult construction, error classification, routing, retry/stuck-loop handling, and the max-cycle stop path. Explain which timeout and recovery behaviors are established by checked-in source and which depend on Python or operating-system runtime behavior; do not present unverified process-termination details as facts."
+    }
+  ]
+}

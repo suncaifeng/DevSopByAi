@@ -1,0 +1,71 @@
+CodeGraph Language Server with MCP support
+
+Usage: codegraph-server-linux-x64 [OPTIONS]
+
+Options:
+      --info
+          Print build info (git hash, build time, rustc version) and exit
+
+      --mcp
+          Run in MCP (Model Context Protocol) mode for AI clients
+
+      --stdio
+          Run in LSP mode over stdio (default, kept for compatibility)
+
+  -w, --workspace <WORKSPACE>
+          Workspace directories to index (can be specified multiple times for multi-project)
+
+  -e, --exclude <EXCLUDE>
+          Directories to exclude from indexing (can be specified multiple times)
+
+      --max-files <MAX_FILES>
+          Maximum number of files to index (default: 5000)
+
+          [default: 5000]
+
+      --embedding-model <EMBEDDING_MODEL>
+          Embedding model: bge-small (384d, 512 ctx, fast — default), jina-code-v2 (768d, 8K ctx, 6× slower), or granite-97m (384d, 32K ctx, IBM ModernBERT multilingual, ~3× slower than bge-small but no truncation on long function bodies)
+
+          [default: bge-small]
+
+      --full-body-embedding
+          Embed full function body instead of just name+signature (captured at parse time, minimal overhead)
+
+      --profile <PROFILE>
+          Scope the MCP tool surface to a named profile.
+
+          `all` (default) exposes every tool (community + pro). Narrower profiles reduce the agent's prompt-context cost on chatty sessions: - `core`     — search + symbol info + AI context (8 tools) - `graph`    — callers/callees/deps/impact/traverse (16 tools) - `memory`   — codegraph_memory_* only (7 tools) - `security` — pro security tools only (empty on community)
+
+          Also reads `CODEGRAPH_TOOL_PROFILE` env var when the flag is unset. MCP mode only — LSP mode ignores this.
+
+      --graph-only
+          Skip embedding generation — build the graph and serve structural tools only. The ONNX model is never loaded (faster startup, lower memory, ~10-50× faster indexing). Semantic search and similarity tools are unavailable. Ideal for CI / one-shot graph queries
+
+      --run-tool <RUN_TOOL>
+          One-shot mode: index the workspace, run a single tool, print its JSON result to stdout, and exit. No MCP stdio handshake. Pair with --tool-args for arguments and --graph-only for CI speed. Example: codegraph-server --graph-only --run-tool codegraph_pr_context \ --tool-args '{"baseBranch":"main","format":"markdown"}'
+
+      --tool-args <TOOL_ARGS>
+          JSON arguments for --run-tool (default: {})
+
+          [default: {}]
+
+      --watch
+          Run as a background watcher daemon: index the workspace, keep it fresh as files change (file watcher + incremental embedding), and persist periodically so MCP/LSP sessions load a warm graph instead of re-indexing. Runs until SIGINT/SIGTERM. Use with --workspace
+
+      --extension-path <EXTENSION_PATH>
+          Path to the extension/package directory that contains the embedding model (daemon mode). When omitted the daemon runs graph-only
+
+      --serve
+          Run as the resident socket engine (Model B): index the workspace, then serve the MCP tool surface to thin `--connect` clients over `--socket`. One heavy process holds the graph + model; sessions become thin relays
+
+      --connect
+          Thin MCP client: connect to a running engine's `--socket` and relay this process's stdio to it. Loads no graph and no model
+
+      --socket <SOCKET>
+          Unix socket path for `--serve` / `--connect` (default: ~/.codegraph/cg-engine.sock)
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version

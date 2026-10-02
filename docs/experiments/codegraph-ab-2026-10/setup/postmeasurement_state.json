@@ -1,0 +1,76 @@
+{
+  "captured_utc": "2026-10-02T04:23:57Z",
+  "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+  "branch": "codex/codegraph-controlled-ab-codexb",
+  "tracked_diff": "",
+  "tracked_diff_cached": "",
+  "untracked_paths": [
+    "?? docs/experiments/"
+  ],
+  "measured_worktree_statuses": {
+    "Q1-R1-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q1-R1-B": {
+      "before": "",
+      "after": ""
+    },
+    "Q1-R2-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q1-R2-B": {
+      "before": "",
+      "after": ""
+    },
+    "Q2-R1-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q2-R1-B": {
+      "before": "",
+      "after": ""
+    },
+    "Q2-R2-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q2-R2-B": {
+      "before": "",
+      "after": ""
+    },
+    "Q3-R1-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q3-R1-B": {
+      "before": "",
+      "after": ""
+    },
+    "Q3-R2-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q3-R2-B": {
+      "before": "",
+      "after": ""
+    },
+    "Q4-R1-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q4-R1-B": {
+      "before": "",
+      "after": ""
+    },
+    "Q4-R2-A": {
+      "before": "",
+      "after": ""
+    },
+    "Q4-R2-B": {
+      "before": "",
+      "after": ""
+    }
+  }
+}

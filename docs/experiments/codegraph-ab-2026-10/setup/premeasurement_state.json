@@ -1,0 +1,13 @@
+{
+  "captured_utc": "2026-10-02T03:15:10Z",
+  "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+  "branch": "codex/codegraph-controlled-ab-codexb",
+  "task_worktree_status_porcelain_before_measurement": "?? docs/experiments/",
+  "prompt_sha256": "04db480fd7e7638e15b6b70a5d48e54d71fb1780d69c20d99e7916a9c5d6c62a",
+  "index_worktree_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+  "index_worktree_status_porcelain": "",
+  "measurement_worktree_policy": "one fresh detached worktree per attempt; clean and exact HEAD checked before and after; clean worktrees removed after evidence capture",
+  "file_open_tracing": "unavailable: strace is not installed; unique_files_read will be null",
+  "ripgrep_available": false,
+  "strace_available": false
+}

@@ -1,0 +1,1 @@
+I called `mcp__codegraph__codegraph_find_entry_points` for entry-point discovery. It returned an approval requirement, and the current policy does not allow approval, so it provided no paths or symbols.

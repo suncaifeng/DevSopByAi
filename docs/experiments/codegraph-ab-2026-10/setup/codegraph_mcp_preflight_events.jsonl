@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"01a0fa8b-8f46-7ed2-bdde-17036263b687"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"I’ll locate the available CodeGraph discovery tool, call one entry-point or navigation query, and report only its returned paths and symbols."}}
+{"type":"item.started","item":{"id":"item_1","type":"mcp_tool_call","server":"codegraph","tool":"codegraph_find_entry_points","arguments":{"entryType":"all","limit":50},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_1","type":"mcp_tool_call","server":"codegraph","tool":"codegraph_find_entry_points","arguments":{"entryType":"all","limit":50},"result":null,"error":{"message":"MCP tool call requires approval, but approval policy is never"},"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"I called `mcp__codegraph__codegraph_find_entry_points` for entry-point discovery. It returned an approval requirement, and the current policy does not allow approval, so it provided no paths or symbols."}}
+{"type":"turn.completed","usage":{"input_tokens":48112,"cached_input_tokens":41216,"cache_write_input_tokens":0,"output_tokens":469,"reasoning_output_tokens":307}}

@@ -1,0 +1,1 @@
+Called `mcp__codegraph__codegraph_find_entry_points`. The call was blocked because it requires approval and the approval policy is `never`, so it returned no paths or symbols. I did not read or change files.

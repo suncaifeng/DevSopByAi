@@ -1,0 +1,492 @@
+{
+  "TASK_ID": "DEVSOP-CODEXB-CODEGRAPH-AB-2026-10-02",
+  "CONTRACT_VERSION": "1.0",
+  "TASK_DEFINITION_COMMIT": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+  "CREATED_FROM_HEAD": "e3c609f5cdbe38bca7e17b87359f29817d91237b",
+  "BENCHMARK_HEAD": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+  "repository_path": "/tmp/devsopbyai-codegraph-controlled-ab-codexb-20261002",
+  "branch": "codex/codegraph-controlled-ab-codexb",
+  "initial_git_status_porcelain": "",
+  "initial_state_captured_utc": "2026-10-02T02:47:10Z",
+  "codex_version": "codex-cli 0.155.1",
+  "model": "gpt-6-luna",
+  "reasoning": "xhigh",
+  "host_os": {
+    "hostname": "ai-control",
+    "system": "Linux",
+    "release": "6.12.107+deb13-amd64",
+    "architecture": "x86_64",
+    "distribution": "Debian GNU/Linux 13 (trixie)"
+  },
+  "codegraph_package": "@astudioplus/codegraph-mcp",
+  "codegraph_package_version": "0.20.1",
+  "codegraph_engine_version": "v0.20.1 (git 489ccf1)",
+  "planned_run_matrix": {
+    "benchmarks": 4,
+    "repeats_per_benchmark": 2,
+    "arms": [
+      "A",
+      "B"
+    ],
+    "measured_sessions": 16,
+    "order": [
+      {
+        "benchmark_id": "Q1",
+        "repeat": "R1",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q1",
+        "repeat": "R1",
+        "arm": "B"
+      },
+      {
+        "benchmark_id": "Q1",
+        "repeat": "R2",
+        "arm": "B"
+      },
+      {
+        "benchmark_id": "Q1",
+        "repeat": "R2",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q2",
+        "repeat": "R1",
+        "arm": "B"
+      },
+      {
+        "benchmark_id": "Q2",
+        "repeat": "R1",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q2",
+        "repeat": "R2",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q2",
+        "repeat": "R2",
+        "arm": "B"
+      },
+      {
+        "benchmark_id": "Q3",
+        "repeat": "R1",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q3",
+        "repeat": "R1",
+        "arm": "B"
+      },
+      {
+        "benchmark_id": "Q3",
+        "repeat": "R2",
+        "arm": "B"
+      },
+      {
+        "benchmark_id": "Q3",
+        "repeat": "R2",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q4",
+        "repeat": "R1",
+        "arm": "B"
+      },
+      {
+        "benchmark_id": "Q4",
+        "repeat": "R1",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q4",
+        "repeat": "R2",
+        "arm": "A"
+      },
+      {
+        "benchmark_id": "Q4",
+        "repeat": "R2",
+        "arm": "B"
+      }
+    ],
+    "soft_timeout_seconds": 480,
+    "hard_timeout_seconds": 720
+  },
+  "run_started_utc": "2026-10-02T02:53:33Z",
+  "preconditions": {
+    "branch_and_contract_match": true,
+    "task_parent_matches_created_from_head": true,
+    "parent_tree_experiment_root_absent": true,
+    "task_head_experiment_root_absent": true,
+    "no_other_executor_active_for_output_root": true,
+    "original_workspace_has_untracked_files": true,
+    "isolated_task_worktree_clean_before_setup": true,
+    "codex_fresh_ephemeral_child_preflight": {
+      "status": "PASS",
+      "thread_id": "01a0fa83-a574-72b1-a507-fc37fd51ac64",
+      "input_tokens": 12920,
+      "output_tokens": 8,
+      "cached_input_tokens": 0,
+      "reasoning": "xhigh"
+    },
+    "codex_global_mcp_server_names": [],
+    "codex_project_config_or_agents_files_found": []
+  },
+  "codegraph_docs_reviewed": [
+    "https://github.com/codegraph-ai/CodeGraph",
+    "https://github.com/codegraph-ai/CodeGraph/blob/main/mcp-package/README.md"
+  ],
+  "codex_cli_isolation": "--ignore-user-config plus per-invocation -c mcp_servers.codegraph for Arm B; Arm A receives no MCP server config. No persistent Codex/AGENTS configuration is edited.",
+  "codegraph_telemetry": "off",
+  "setup_status": "READY",
+  "codegraph_installation": {
+    "npm_package": "@astudioplus/codegraph-mcp@0.20.1",
+    "npm_integrity": "sha512-JiXUMNmxNhCAphsdBOL7ma9ZQekLqNb1zjBo55SRKy66qFbCdpYmBNI6zZaQcm+DDnGfyfmkzUg5N40wzkxupw==",
+    "install_prefix": "/tmp/devsopbyai-codegraph-ab-install-20261002",
+    "isolated_home": "/tmp/devsopbyai-codegraph-ab-home-20261002",
+    "telemetry": "off",
+    "optional_static_model_download": "skipped",
+    "package_install_wall_seconds": 43,
+    "engine_git_commit": "489ccf1",
+    "engine_build_time_utc": "2026-08-09T20:51:20Z",
+    "workspace": "/tmp/devsopbyai-codegraph-ab-index-20261002",
+    "index_state": "READY_GRAPH_ONLY",
+    "index_start_utc": "2026-10-02T03:03:11Z",
+    "index_end_utc": "2026-10-02T03:04:23Z",
+    "first_index_and_smoke_wall_seconds": 72,
+    "index_size_observed": "128 MiB (CodeGraph RocksDB under isolated temporary HOME; exact total filesystem allocation not measured)",
+    "measurement_note": "The engine did not expose a separate index-only timer; 72 seconds is the combined first server startup/index and first structural query preflight, recorded outside measured query latency.",
+    "install_command_observed": "npm install --prefix /tmp/devsopbyai-codegraph-ab-install-20261002 @astudioplus/codegraph-mcp@0.20.1",
+    "install_source_method": "Pinned npm package, isolated temporary prefix; engine downloaded by package postinstall, optional static model fetch skipped; no global install.",
+    "index_command_observed": "/tmp/devsopbyai-codegraph-ab-install-20261002/node_modules/.bin/codegraph-mcp --workspace /tmp/devsopbyai-codegraph-ab-index-20261002 --graph-only --profile graph",
+    "index_environment": {
+      "HOME": "/tmp/devsopbyai-codegraph-ab-home-20261002",
+      "CODEGRAPH_TELEMETRY": "off"
+    },
+    "index_timing_note": "First MCP server start lazily indexed the workspace and ran the first structural smoke query; separate index-only duration was not emitted by the engine.",
+    "index_size_observed_bytes": null,
+    "index_size_observed_human": "about 128 MiB (exact allocation not measured)"
+  },
+  "codegraph_setup_start_utc": "2026-10-02T02:54:41Z",
+  "codegraph_install_end_utc": "2026-10-02T02:55:24Z",
+  "prompts_frozen_at_utc": "2026-10-02T03:10:30Z",
+  "benchmark_prompts_sha256": "04db480fd7e7638e15b6b70a5d48e54d71fb1780d69c20d99e7916a9c5d6c62a",
+  "prompt_freeze_status": "FROZEN_BEFORE_MEASURED_RUNS",
+  "codegraph_setup_end_utc": "2026-10-02T03:04:23Z",
+  "codegraph_setup_wall_seconds_including_integration_retries": 582,
+  "arm_isolation": {
+    "A": "--ignore-user-config; no MCP server config; CodeGraph binary and indexed workspace absent from PATH and run worktree.",
+    "B": "Per-invocation CodeGraph MCP config only; --graph-only --profile graph; enabled 13 read-only navigation tools with default approval; source tree in indexed detached worktree pinned to BENCHMARK_HEAD; telemetry off."
+  },
+  "run_timeout_policy": {
+    "soft_seconds": 480,
+    "hard_seconds": 720,
+    "external_process_group_termination": true
+  },
+  "measurement_started_utc": "2026-10-02T03:15:10Z",
+  "measurement_finished_utc": "2026-10-02T04:20:02Z",
+  "actual_run_order": [
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R1",
+      "arm": "A",
+      "run_id": "Q1-R1-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R1",
+      "arm": "B",
+      "run_id": "Q1-R1-B",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R2",
+      "arm": "B",
+      "run_id": "Q1-R2-B",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R2",
+      "arm": "A",
+      "run_id": "Q1-R2-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R1",
+      "arm": "B",
+      "run_id": "Q2-R1-B",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R1",
+      "arm": "A",
+      "run_id": "Q2-R1-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R2",
+      "arm": "A",
+      "run_id": "Q2-R2-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R2",
+      "arm": "B",
+      "run_id": "Q2-R2-B",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R1",
+      "arm": "A",
+      "run_id": "Q3-R1-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R1",
+      "arm": "B",
+      "run_id": "Q3-R1-B",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R2",
+      "arm": "B",
+      "run_id": "Q3-R2-B",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R2",
+      "arm": "A",
+      "run_id": "Q3-R2-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R1",
+      "arm": "B",
+      "run_id": "Q4-R1-B",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R1",
+      "arm": "A",
+      "run_id": "Q4-R1-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R2",
+      "arm": "A",
+      "run_id": "Q4-R2-A",
+      "status": "COMPLETE"
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R2",
+      "arm": "B",
+      "run_id": "Q4-R2-B",
+      "status": "COMPLETE"
+    }
+  ],
+  "measured_sessions_recorded": 16,
+  "measurement_status_counts": {
+    "COMPLETE": 16
+  },
+  "unique_files_read_metric": "null: host lacks strace, and CLI event telemetry does not expose exact file-open events",
+  "thread_ids_unique": true,
+  "measured_worktree_clean_before_and_after": true,
+  "measurement_order_verified_from_records": true,
+  "tool_event_metrics_method": "Codex JSONL item.started/item.completed events; exact unique open-file events unavailable without strace",
+  "ripgrep_available_on_host": false,
+  "file_open_tracing_available": false,
+  "measurement_capture_limits": {
+    "unique_files_read": null,
+    "retrieval_tokens": null,
+    "reason": "Host does not provide strace and Codex JSONL does not emit exact file-open or retrieval-token events."
+  },
+  "answer_files_sha256": {
+    "Q1-R1-A.md": "46f1765c609e6a0c18875719ba0831f3904f99ecdcc7bf9cb8d45bf5e4dbfd1f",
+    "Q1-R1-B.md": "47501f5e918573dc9b0b261a9a16dde120e07c5faf84e1920ee5c2d547b27589",
+    "Q1-R2-A.md": "a3c81bcf67249dc1cf1aa5f05a16e5ed07c1dc4a0388092bcbc8b1b0d2d64988",
+    "Q1-R2-B.md": "5f6074f214646a470988dfdd789f950bd7cb241b4430e33d1b7509bfa08d0494",
+    "Q2-R1-A.md": "d11b4a64f5209b1827fac39c44a5af65bae7bfd94cef1bdd208d2c77dae2c929",
+    "Q2-R1-B.md": "d7bc82b34da8a0803c979875014dc08cad1d5f3a913f0e15464e2243f963f82d",
+    "Q2-R2-A.md": "9ef4d999feb34ce923490a0ce1a6bbe527531c39ba5cc18747e55c9c0e0be882",
+    "Q2-R2-B.md": "3edda3a14457ba06bc29f395f3eb315a505f4b8758656615572468abc277d503",
+    "Q3-R1-A.md": "a7e1eb90f909ecdfb11ae62aac53b796a177f4efe28c37f7d13042905c3510dc",
+    "Q3-R1-B.md": "00aead2204a7fa76f472bf56632eb3f403171e3a58172003f1d90ff98093582f",
+    "Q3-R2-A.md": "81bfb226c2397e1882d09f7c1f14826be6a11b50e61bea8a56dfdb792f8450bc",
+    "Q3-R2-B.md": "796d6dae13f04b910e6e9be7ce5db4c385c033ea9979adc228b3c51e92ca7315",
+    "Q4-R1-A.md": "7cc9c93b1deefe0c096bb038460cb3783598a7d8e343a62a26d40b5b4b889160",
+    "Q4-R1-B.md": "0e201f28fd85f9390fc74086422a2e26b299c1e8fcee75f3e893a909077d09aa",
+    "Q4-R2-A.md": "18fb8ebe8ed1e0a24994d43b207ab8cf4869722fb55f76e14ad371a78df7fa3c",
+    "Q4-R2-B.md": "83859b24c78d13b7ecfa999a65ffc34f736a0a4ab155610a128283decac7ce45"
+  },
+  "blinded_validation_inputs_sha256": {
+    "Q1.json": "95ea9cc7b95cc38c177603b394616b185fc6f04410ab4be6b30c9edf86f67b23",
+    "Q2.json": "0f95ea39d6433d420e682bc16c4747b80ea43bcc1b4170fe85ddcaa3e08c73b2",
+    "Q3.json": "225fa255f84eeda16aaf90141fc3392f23db48b89f18f5d3d00f0bbb4221501f",
+    "Q4.json": "c3547f59021caf53556380c312f936f892be825aba5d3c853a4e94a0833438f9"
+  },
+  "blinded_validation_revision": "2",
+  "blinded_validation_revision1_superseded_reason": "Sanitizer altered CODEGRAPH inside a valid tracked TaskContract filename; evidence preserved under validation/round1.",
+  "blinded_validation_inputs_sha256_revision2": {
+    "Q1.json": "57697b60ce86789d6ac1b6677dbbf0750b4acd2a058af57166dcc6a1546e680d",
+    "Q2.json": "90e8f31a51f955e1686fc9daf77a44596463597060622e2969db0c4496dc2c36",
+    "Q3.json": "0e9f38bd5f41ffc349f7daea39994b18d00d89ed4af71fbb9da381d882377aad",
+    "Q4.json": "f3064299aaa7ebfc82a60f14be9a2427daa6bc13c4155a6aa983f71429709331"
+  },
+  "git_remotes": [
+    {
+      "name": "origin",
+      "url": "git@github.com:suncaifeng/DevSopByAi.git",
+      "direction": "fetch"
+    },
+    {
+      "name": "origin",
+      "url": "git@github.com:suncaifeng/DevSopByAi.git",
+      "direction": "push"
+    }
+  ],
+  "prompt_freeze_verified_sha256": "04db480fd7e7638e15b6b70a5d48e54d71fb1780d69c20d99e7916a9c5d6c62a",
+  "validation_status": "COMPLETE",
+  "validation_revision_used": 2,
+  "validation_revision1_superseded": true,
+  "validation_revision1_superseded_reason": "Anonymizer replaced CODEGRAPH substring within valid tracked TaskContract filename; preserved and superseded by revision 2 with four new fresh validators.",
+  "blinded_validator_runs": [
+    {
+      "validator_id": "validator-Q1",
+      "benchmark_id": "Q1",
+      "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+      "model": "gpt-6-luna",
+      "reasoning": "xhigh",
+      "start_time": "2026-10-02T05:03:22Z",
+      "end_time": "2026-10-02T05:10:27Z",
+      "wall_seconds": 424.521,
+      "soft_timeout_exceeded": false,
+      "hard_timeout_reached": false,
+      "status": "COMPLETE",
+      "fresh_ephemeral_no_resume": true,
+      "mcp_config": "none",
+      "thread_id": "01a0fafe-e265-7780-953c-7a1a6956b366",
+      "input_tokens": 108504,
+      "output_tokens": 19981,
+      "cached_tokens": 69888,
+      "validator_prompt_sha256": "a7746e2205efe41cdd3828b167c02e527aea8b24a780ea759307d8672336158c",
+      "input_sha256": "57697b60ce86789d6ac1b6677dbbf0750b4acd2a058af57166dcc6a1546e680d",
+      "answer_sha256": "01118762ae78c1efe6bfca0d53b19f0a1df3658db279fdd37e064d93c2c87bec"
+    },
+    {
+      "validator_id": "validator-Q2",
+      "benchmark_id": "Q2",
+      "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+      "model": "gpt-6-luna",
+      "reasoning": "xhigh",
+      "start_time": "2026-10-02T05:10:27Z",
+      "end_time": "2026-10-02T05:17:39Z",
+      "wall_seconds": 432.357,
+      "soft_timeout_exceeded": false,
+      "hard_timeout_reached": false,
+      "status": "COMPLETE",
+      "fresh_ephemeral_no_resume": true,
+      "mcp_config": "none",
+      "thread_id": "01a0fb05-5cca-7103-be78-0efaa702bcc8",
+      "input_tokens": 103663,
+      "output_tokens": 18592,
+      "cached_tokens": 69888,
+      "validator_prompt_sha256": "c5c6d7b8e99dffbaa41bc7368d8e50a39e714664facf2bc857700f969cda40a0",
+      "input_sha256": "90e8f31a51f955e1686fc9daf77a44596463597060622e2969db0c4496dc2c36",
+      "answer_sha256": "53368a37497e9595da2ce2ec7b79521983af5d2dc5dce2f9723a989056cc4934"
+    },
+    {
+      "validator_id": "validator-Q3",
+      "benchmark_id": "Q3",
+      "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+      "model": "gpt-6-luna",
+      "reasoning": "xhigh",
+      "start_time": "2026-10-02T05:17:39Z",
+      "end_time": "2026-10-02T05:22:31Z",
+      "wall_seconds": 291.661,
+      "soft_timeout_exceeded": false,
+      "hard_timeout_reached": false,
+      "status": "COMPLETE",
+      "fresh_ephemeral_no_resume": true,
+      "mcp_config": "none",
+      "thread_id": "01a0fb0b-f5c5-7c23-b6c5-ac9f251be78c",
+      "input_tokens": 115705,
+      "output_tokens": 15684,
+      "cached_tokens": 78080,
+      "validator_prompt_sha256": "f766dbf6f585c74df0a255994aadca42f287a5d9f6f9456308951a2b445078c9",
+      "input_sha256": "0e9f38bd5f41ffc349f7daea39994b18d00d89ed4af71fbb9da381d882377aad",
+      "answer_sha256": "b738f9af65653e13d4c65a66fdda85ef9234f52954954532d5c702f6de786a01"
+    },
+    {
+      "validator_id": "validator-Q4",
+      "benchmark_id": "Q4",
+      "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+      "model": "gpt-6-luna",
+      "reasoning": "xhigh",
+      "start_time": "2026-10-02T05:22:31Z",
+      "end_time": "2026-10-02T05:28:37Z",
+      "wall_seconds": 365.994,
+      "soft_timeout_exceeded": false,
+      "hard_timeout_reached": false,
+      "status": "COMPLETE",
+      "fresh_ephemeral_no_resume": true,
+      "mcp_config": "none",
+      "thread_id": "01a0fb10-692d-7c53-a867-ae29fa83829c",
+      "input_tokens": 94333,
+      "output_tokens": 19653,
+      "cached_tokens": 62720,
+      "validator_prompt_sha256": "d82d66ad07395cdf6660eeb02630f8d0967942d84121a159696d544f04ef9ed3",
+      "input_sha256": "f3064299aaa7ebfc82a60f14be9a2427daa6bc13c4155a6aa983f71429709331",
+      "answer_sha256": "158b8b2b423167a921c1a63c85cd9e3d4c4ad8357c7a48efd494b9d46f15706d"
+    }
+  ],
+  "engineering_disposition": "DO_NOT_ADOPT",
+  "safety_gate": "FAIL",
+  "utility_gate": "FAIL",
+  "T_setup_seconds": 582,
+  "first_measured_codegraph_use_run_id": "Q1-R1-B",
+  "T_first_measured_codegraph_use_seconds": 216.376,
+  "T_first_use_seconds": 798.376,
+  "median_wall_time_saved_per_task_seconds_A_minus_B": -81.533,
+  "break_even_tasks": null,
+  "validator_result_file": "docs/experiments/codegraph-ab-2026-10/validation/validation.json",
+  "final_report_file": "docs/experiments/codegraph-ab-2026-10/FINAL-REPORT.md",
+  "source_mutation_during_measurement": false,
+  "tests_run": false,
+  "test_runner_invocations_observed": 0,
+  "final_artifact_scope": "docs/experiments/codegraph-ab-2026-10 only; no production source/tests/schemas/AGENTS/Codex global config changed; no .codegraph committed",
+  "setup_timing": {
+    "T_setup_seconds": 582,
+    "package_install_seconds": 43,
+    "first_index_server_start_plus_smoke_query_seconds": 72,
+    "T_query_first_measured_codegraph_use_seconds": 216.376,
+    "T_first_use_seconds": 798.376,
+    "index_only_seconds": null,
+    "index_size": "about 128 MiB (exact allocation not measured)"
+  },
+  "arm_map_sha256": "1c21cea373c94550c865b1c7ceadbe563047e386903dbf47dd9b0c7827a130c6",
+  "arm_map_revision": "2 (matches final blinded validation inputs)",
+  "final_validation_runs_file": "docs/experiments/codegraph-ab-2026-10/validation/validator-runs.json",
+  "setup_evidence_normalization": {
+    "file": "setup/codegraph-engine-help.txt",
+    "normalization": "trimmed trailing whitespace from captured CLI help output for Git cleanliness; text content otherwise preserved",
+    "captured_raw_sha256": "9fddf45b80bc72737fd08c33b8d33c38e9ee54e259e7bbf7f8a07c3d7b4ffe74",
+    "normalized_sha256": "082f6918c43161b708b419ea411e89f4594396c15d16f5584ce93db19eb098e0"
+  }
+}

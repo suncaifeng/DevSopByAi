@@ -1,0 +1,54 @@
+{
+  "generated_at_utc": "2026-10-02T04:23:57Z",
+  "randomization": "independent SystemRandom assignment per benchmark-repeat pair",
+  "pairs": {
+    "Q1-R1": {
+      "label_to_arm": {
+        "X": "A",
+        "Y": "B"
+      }
+    },
+    "Q1-R2": {
+      "label_to_arm": {
+        "Y": "A",
+        "X": "B"
+      }
+    },
+    "Q2-R1": {
+      "label_to_arm": {
+        "X": "A",
+        "Y": "B"
+      }
+    },
+    "Q2-R2": {
+      "label_to_arm": {
+        "X": "A",
+        "Y": "B"
+      }
+    },
+    "Q3-R1": {
+      "label_to_arm": {
+        "X": "A",
+        "Y": "B"
+      }
+    },
+    "Q3-R2": {
+      "label_to_arm": {
+        "Y": "A",
+        "X": "B"
+      }
+    },
+    "Q4-R1": {
+      "label_to_arm": {
+        "X": "A",
+        "Y": "B"
+      }
+    },
+    "Q4-R2": {
+      "label_to_arm": {
+        "Y": "A",
+        "X": "B"
+      }
+    }
+  }
+}

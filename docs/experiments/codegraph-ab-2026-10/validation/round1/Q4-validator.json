@@ -1,0 +1,426 @@
+{
+  "benchmark_id": "Q4",
+  "source_ground_truth": "At commit 37bc219ae4f5989d0bfaf6bfb917ae86108d33e1, `ExecutionInput.metadata` is a general dictionary. `codex_run._timeout_seconds` reads `timeout_seconds`, accepts a positive `int`, and otherwise returns the 300-second default; `run_codex` passes that value to `subprocess.run(timeout=...)`. The metadata is also serialized into the temporary spec, but the subprocess limit comes from the argument. If `subprocess.run` raises `TimeoutExpired`, `run_codex` directly returns a failed result with exit code -1, `CODEX_ERROR`, timeout summary, output fields, and `tests.ran=False`; it does not call `classify_error`. On normal completion, nonzero exits are classified from stderr and stdout. `main.main` appends each result to history before routing. The router checks success, blocking DSL state, then stuck-loop detection before error-specific routing. Since the detector takes two history entries and appends the current error, two consecutive identical results in `main` can satisfy its three-entry check; repeated `CODEX_ERROR` then routes to FATAL. Otherwise, CODEX_ERROR can retry if both budgets allow it. Retry and repair transitions advance `total_cycles`; the loop exits at the cycle limit and prints its stop message, while FATAL returns earlier. These are checked-in control-flow facts. The timeout argument and exception are the boundary of what the repository establishes about timeout enforcement. The local Python `subprocess.run` and `TimeoutExpired` documentation confirms that a timeout can raise `TimeoutExpired` while waiting for a child; the inspected documentation did not establish process or descendant termination details.",
+  "required_dependencies": [
+    {
+      "id": "D1",
+      "file": "contracts.py",
+      "symbol": "ExecutionInput; validate_execution_input",
+      "critical": true,
+      "description": "Defines the origin of the configured timeout: metadata is a general dictionary on ExecutionInput, separate from RunPolicy. Input validation checks other input and policy fields but does not inspect timeout_seconds.",
+      "source_evidence": "contracts.py:ExecutionInput:79-84; contracts.py:validate_execution_input:200-228; contracts.py:RunPolicy:70-75"
+    },
+    {
+      "id": "D2",
+      "file": "codex_run.py",
+      "symbol": "_timeout_seconds; run_codex; _write_temp_spec",
+      "critical": true,
+      "description": "Selects the configured timeout or default, passes it to subprocess.run, and separately serializes metadata into the temporary spec.",
+      "source_evidence": "codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; codex_run.py:run_codex:36-46; codex_run.py:_write_temp_spec:126-155; codex_run.py:_timeout_seconds:166-170"
+    },
+    {
+      "id": "D3",
+      "file": "codex_run.py; contracts.py",
+      "symbol": "run_codex; ExecutionResult; TestResult; validate_execution_result",
+      "critical": true,
+      "description": "Defines the TimeoutExpired conversion into an ExecutionResult and the contract checks applied to that result.",
+      "source_evidence": "codex_run.py:run_codex:77-101; contracts.py:ExecutionResult:95-104; contracts.py:TestResult:87-93; contracts.py:validate_execution_result:231-249"
+    },
+    {
+      "id": "D4",
+      "file": "codex_run.py",
+      "symbol": "run_codex; classify_error",
+      "critical": true,
+      "description": "Distinguishes normal-return error classification from the direct TimeoutExpired result path and establishes classifier matching order.",
+      "source_evidence": "codex_run.py:run_codex:48-75; codex_run.py:classify_error:180-211"
+    },
+    {
+      "id": "D5",
+      "file": "main.py; contracts.py",
+      "symbol": "main; OrchestratorState; RunPolicy",
+      "critical": true,
+      "description": "Establishes the main execution loop, result history ordering, initial cycle state, and max-cycle exit path.",
+      "source_evidence": "main.py:main:21-76; contracts.py:RunPolicy:70-75; contracts.py:OrchestratorState:118-128"
+    },
+    {
+      "id": "D6",
+      "file": "routing_system.py; contracts.py; main.py",
+      "symbol": "route_decision; _detect_stuck_loop; _route_stuck_loop; can_retry_codex",
+      "critical": true,
+      "description": "Establishes route precedence, stuck-loop behavior, CODEX_ERROR routing, and retry-budget conditions.",
+      "source_evidence": "routing_system.py:route_decision:19-118; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171; contracts.py:can_retry_codex:270-275; main.py:main:39-42"
+    },
+    {
+      "id": "D7",
+      "file": "main.py; contracts.py",
+      "symbol": "_apply_retry_code_route; _apply_repair_spec_route; can_retry_codex; can_repair_spec",
+      "critical": true,
+      "description": "Establishes how retry and repair transitions update counters and how those transitions interact with cycle and route budgets.",
+      "source_evidence": "main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-112; contracts.py:can_retry_codex:270-275; contracts.py:can_repair_spec:277-281"
+    },
+    {
+      "id": "D8",
+      "file": "main.py; codex_run.py",
+      "symbol": "main; run_codex; _apply_retry_code_route",
+      "critical": true,
+      "description": "Establishes that the loop calls run_codex again with the same ExecutionInput after retry handling; the retry handler changes state counters, not timeout metadata.",
+      "source_evidence": "main.py:main:21-42,52-54; main.py:_apply_retry_code_route:91-100; codex_run.py:run_codex:22,45"
+    }
+  ],
+  "tests_or_absent": "The tracked tree contains no test files or test directory, and no timeout-specific tests are present. `main.main` is the only checked-in caller of `run_codex`; no other expected consumer of the timeout helper was found.",
+  "answer_evaluations": [
+    {
+      "answer_id": "R1-X",
+      "verdict": "partial",
+      "claims": [
+        {
+          "claim": "ExecutionInput uses general metadata; _timeout_seconds selects a positive integer timeout or the 300-second default, and metadata is also written into the temporary spec.",
+          "verdict": "correct",
+          "evidence": "contracts.py:ExecutionInput:79-84; codex_run.py:_timeout_seconds:166-170; codex_run.py:_write_temp_spec:126-155",
+          "dependency_id": "D1"
+        },
+        {
+          "claim": "The selected timeout is passed to subprocess.run, and TimeoutExpired produces a failed ExecutionResult with exit_code=-1, CODEX_ERROR, a timeout summary, output fields, tests.ran=False, and timeout_seconds in raw.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:40-46,77-101",
+          "dependency_id": "D2"
+        },
+        {
+          "claim": "The TimeoutExpired handler assigns CODEX_ERROR directly; normal returned failures instead call classify_error, whose earlier test/spec/validation/environment checks precede the timeout/runtime-error checks.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:48-55,77-101; codex_run.py:classify_error:180-211",
+          "dependency_id": "D4"
+        },
+        {
+          "claim": "main stores a result in history before routing; blocking DSL state and stuck-loop detection precede error-specific routing.",
+          "verdict": "correct",
+          "evidence": "main.py:main:36-43; routing_system.py:route_decision:33-53",
+          "dependency_id": "D5"
+        },
+        {
+          "claim": "A non-blocked, non-stuck CODEX_ERROR retries when retry and cycle budgets allow, and otherwise routes to FATAL.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:86-101; contracts.py:can_retry_codex:270-275",
+          "dependency_id": "D6"
+        },
+        {
+          "claim": "Because main appends the current result before the detector takes two history entries and appends the current error, two consecutive matching errors can satisfy the three-entry stuck check; repeated CODEX_ERROR then routes to FATAL.",
+          "verdict": "correct",
+          "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "D6"
+        },
+        {
+          "claim": "Retry and repair transitions advance total_cycles; the loop stops at max_total_cycles, and the counter does not simply count every invocation.",
+          "verdict": "correct",
+          "evidence": "contracts.py:OrchestratorState:118-128; main.py:main:29,52-59,75-76; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-112",
+          "dependency_id": "D7"
+        },
+        {
+          "claim": "The checked-in adapter does not establish precise timeout enforcement or process/descendant termination; those details are outside the shown source.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:40-46,77-101 contains the timeout argument and exception handler but no explicit termination or process-group operation. Local subprocess documentation inspected confirms timeout can raise TimeoutExpired but does not establish termination details.",
+          "dependency_id": "D3"
+        },
+        {
+          "claim": "A separate checked-in task policy says hard timeout records TIMEOUT and terminates the measured child, and limits retries to transient failures while excluding genuine workload timeouts.",
+          "verdict": "correct",
+          "evidence": "The policy content is present at docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:605-641, including hard-timeout actions and retry exclusions. It is a task policy, not the executable run_codex timeout behavior.",
+          "dependency_id": null
+        },
+        {
+          "claim": "The answer author did not modify files or run tests.",
+          "verdict": "unsupported",
+          "evidence": "Repository source and Git state cannot establish the answer author's prior actions.",
+          "dependency_id": null
+        }
+      ],
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7"
+      ],
+      "required_dependency_ids_missed": [
+        "D8"
+      ],
+      "critical_omissions": [
+        "Does not explicitly trace that a retry calls run_codex again with the same ExecutionInput, so the configured timeout metadata remains unchanged."
+      ],
+      "invented_or_unsupported_edges": [],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [
+        "The cited task path containing `[retrieval-system]` does not exist in the tracked tree. The policy content is supported by the checked-in CODEGRAPH task document cited in the evidence."
+      ],
+      "coverage_note": "Covers selection, exception handling, classification, routing, stuck detection, and the max-cycle stop. The retry-to-same-timeout link is missing."
+    },
+    {
+      "answer_id": "R1-Y",
+      "verdict": "partial",
+      "claims": [
+        {
+          "claim": "The checked-in source connects main to run_codex and route_decision.",
+          "verdict": "correct",
+          "evidence": "main.py:main:5-18,36-43",
+          "dependency_id": "D5"
+        },
+        {
+          "claim": "A graph was used as a discovery aid.",
+          "verdict": "unsupported",
+          "evidence": "This provenance claim is not established by repository source. Use of graph results also conflicts with the validator's instruction to avoid CodeGraph and external graph results.",
+          "dependency_id": null
+        },
+        {
+          "claim": "ExecutionInput has general metadata; timeout selection defaults to 300 seconds unless metadata contains a positive integer; input validation does not validate timeout metadata; metadata is serialized into the temp spec.",
+          "verdict": "correct",
+          "evidence": "contracts.py:ExecutionInput:79-84; contracts.py:validate_execution_input:200-228; codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; codex_run.py:_write_temp_spec:126-155; codex_run.py:_timeout_seconds:166-170",
+          "dependency_id": "D1"
+        },
+        {
+          "claim": "The timeout is supplied only to subprocess.run, while duration starts before temporary-spec creation and therefore covers more than the subprocess call.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:33-46,77-80",
+          "dependency_id": "D2"
+        },
+        {
+          "claim": "TimeoutExpired is converted directly into a failed result with exit_code=-1, CODEX_ERROR, a fixed summary, output fields, tests.ran=False, and timeout_seconds in raw; the handler does not call classify_error.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:77-101",
+          "dependency_id": "D3"
+        },
+        {
+          "claim": "Normal nonzero exits are classified from stderr and stdout, with test/spec/validation/environment text checked before timeout/runtime exception text.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:48-55; codex_run.py:classify_error:180-211",
+          "dependency_id": "D4"
+        },
+        {
+          "claim": "main appends history before routing; success, blocking DSL state, and stuck-loop checks precede error-specific routing; two consecutive matching errors can trip the three-entry check and repeated CODEX_ERROR routes to FATAL.",
+          "verdict": "correct",
+          "evidence": "main.py:main:36-43; routing_system.py:route_decision:33-53; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "D6"
+        },
+        {
+          "claim": "Blocking DSL state takes precedence over stuck detection; repair handling advances counters/spec_version, has an unimplemented hook, and does not replace the ExecutionInput used on the next loop.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:42-49; main.py:main:56-59; main.py:_apply_repair_spec_route:102-112; main.py:main:36",
+          "dependency_id": "D7"
+        },
+        {
+          "claim": "A retry reuses the same timeout configuration, and a retry reaching max_total_cycles is followed by loop exit before another subprocess call.",
+          "verdict": "correct",
+          "evidence": "main.py:main:29,36,52-54; main.py:_apply_retry_code_route:91-100; codex_run.py:run_codex:45",
+          "dependency_id": "D8"
+        },
+        {
+          "claim": "The source establishes the timeout argument and handling if TimeoutExpired is raised, but does not establish Python timing precision or child/process-group cleanup.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:40-46,77-101; local subprocess documentation confirms exception behavior for a timeout but not process termination details.",
+          "dependency_id": "D3"
+        }
+      ],
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8"
+      ],
+      "required_dependency_ids_missed": [],
+      "critical_omissions": [],
+      "invented_or_unsupported_edges": [
+        "The claimed graph-discovery provenance is unsupported and relies on a discovery source the validator was instructed not to use."
+      ],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [
+        "The answer explicitly says a graph was used as a discovery aid, contrary to the validator's source restrictions. Its technical code claims are otherwise supported by checked-in source."
+      ],
+      "coverage_note": "Technically comprehensive and distinguishes source control flow from runtime behavior, but the stated graph use violates the independent-validation instructions."
+    },
+    {
+      "answer_id": "R2-Y",
+      "verdict": "complete",
+      "claims": [
+        {
+          "claim": "ExecutionInput metadata is general-purpose and separate from RunPolicy; input validation checks other input/policy requirements but not timeout metadata.",
+          "verdict": "correct",
+          "evidence": "contracts.py:RunPolicy:70-75; contracts.py:ExecutionInput:79-84; contracts.py:validate_execution_input:200-228",
+          "dependency_id": "D1"
+        },
+        {
+          "claim": "_timeout_seconds uses a positive integer from metadata or defaults to 300, and run_codex passes it to subprocess.run while also serializing metadata into the temp spec.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; codex_run.py:run_codex:36-46; codex_run.py:_write_temp_spec:126-155; codex_run.py:_timeout_seconds:166-170",
+          "dependency_id": "D2"
+        },
+        {
+          "claim": "Normal returns classify nonzero exits from stderr/stdout; timeout/runtime text is checked after test, spec, validation, and environment terms.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:48-55; codex_run.py:classify_error:180-211",
+          "dependency_id": "D4"
+        },
+        {
+          "claim": "TimeoutExpired directly creates a failed result with exit_code=-1, CODEX_ERROR, a fixed summary, output fields, tests.ran=False, and timeout metadata; finally attempts temp-file cleanup while ignoring OSError.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:77-101,121-123; codex_run.py:_cleanup_temp_spec:173-177",
+          "dependency_id": "D3"
+        },
+        {
+          "claim": "main validates and stores the result, appends history before routing, and blocking DSL state precedes stuck detection and ordinary CODEX_ERROR routing.",
+          "verdict": "correct",
+          "evidence": "main.py:main:36-43; routing_system.py:route_decision:33-53",
+          "dependency_id": "D5"
+        },
+        {
+          "claim": "The detector's slice-and-append logic counts the current error twice after main appends it, so two consecutive identical CODEX_ERROR results can trip the three-entry test and route to FATAL.",
+          "verdict": "correct",
+          "evidence": "main.py:main:39-42; routing_system.py:STUCK_LOOP_WINDOW:16; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "D6"
+        },
+        {
+          "claim": "When stuck detection does not fire, CODEX_ERROR retries if retry and cycle budgets allow; retries use the same ExecutionInput, so timeout metadata is unchanged. Defaults are 10 total cycles and 2 Codex retries.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:86-101; contracts.py:can_retry_codex:270-275; contracts.py:RunPolicy:70-75; main.py:main:29,36,52-54; main.py:_apply_retry_code_route:91-100",
+          "dependency_id": "D8"
+        },
+        {
+          "claim": "total_cycles begins at zero and advances on retry or repair transitions; reaching the maximum exits the loop and prints the max-cycle message, whereas FATAL returns earlier.",
+          "verdict": "correct",
+          "evidence": "contracts.py:OrchestratorState:118-128; main.py:main:29,69-76; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-112",
+          "dependency_id": "D7"
+        },
+        {
+          "claim": "The source does not establish precise timeout timing or process/descendant termination; those details are runtime-dependent and are not asserted.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:40-46,77-101; local subprocess documentation inspected confirms timeout exception behavior but does not establish termination details.",
+          "dependency_id": "D3"
+        },
+        {
+          "claim": "No tests were run and no files were changed by the answer author.",
+          "verdict": "unsupported",
+          "evidence": "The answer author's prior actions cannot be established from repository source or Git state.",
+          "dependency_id": null
+        }
+      ],
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8"
+      ],
+      "required_dependency_ids_missed": [],
+      "critical_omissions": [],
+      "invented_or_unsupported_edges": [],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [
+        "The citation `contracts.py:71` identifies RunPolicy but not ExecutionInput; ExecutionInput is defined at contracts.py:79-84."
+      ],
+      "coverage_note": "Covers the timeout path, normal classification, routing precedence, stuck-loop behavior, retry preservation of timeout metadata, and max-cycle behavior."
+    },
+    {
+      "answer_id": "R2-X",
+      "verdict": "partial",
+      "claims": [
+        {
+          "claim": "ExecutionInput.metadata is a general dictionary separate from RunPolicy, timeout selection uses a positive integer or the 300-second default, and input validation does not validate timeout metadata.",
+          "verdict": "correct",
+          "evidence": "contracts.py:RunPolicy:70-75; contracts.py:ExecutionInput:79-84; contracts.py:validate_execution_input:200-228; codex_run.py:_timeout_seconds:166-170",
+          "dependency_id": "D1"
+        },
+        {
+          "claim": "run_codex passes the selected timeout to subprocess.run and separately writes metadata to the temporary spec.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:36-46; codex_run.py:_write_temp_spec:126-155",
+          "dependency_id": "D2"
+        },
+        {
+          "claim": "TimeoutExpired constructs a failed result with exit_code=-1, CODEX_ERROR, a timeout summary, output fields, tests.ran=False, and raw timeout metadata; it recomputes the helper value for raw, and finally attempts temporary-file cleanup.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:77-101,121-123",
+          "dependency_id": "D3"
+        },
+        {
+          "claim": "The TimeoutExpired path bypasses classify_error, while ordinary nonzero returns use it and its earlier test/spec/validation/environment checks take precedence over timeout text.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:48-55,77-101; codex_run.py:classify_error:180-211",
+          "dependency_id": "D4"
+        },
+        {
+          "claim": "main records results before routing; blocking DSL state and stuck-loop detection precede ordinary CODEX_ERROR retry handling.",
+          "verdict": "correct",
+          "evidence": "main.py:main:36-43; routing_system.py:route_decision:33-53,86-101",
+          "dependency_id": "D5"
+        },
+        {
+          "claim": "Two consecutive matching results can satisfy the detector because the current error is present in history and appended again; repeated CODEX_ERROR then routes to FATAL before the ordinary retry branch.",
+          "verdict": "correct",
+          "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "D6"
+        },
+        {
+          "claim": "A non-stuck CODEX_ERROR retries when retry and cycle budgets allow, otherwise becomes fatal; the loop's default limits are 10 cycles and 2 retries.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:86-101; contracts.py:RunPolicy:70-75; contracts.py:can_retry_codex:270-275",
+          "dependency_id": "D6"
+        },
+        {
+          "claim": "Retries advance counters and reaching max_total_cycles exits before another subprocess invocation; a FATAL route returns before the max-cycle message.",
+          "verdict": "correct",
+          "evidence": "main.py:main:29,36,52-54,69-76; main.py:_apply_retry_code_route:91-100",
+          "dependency_id": "D5"
+        },
+        {
+          "claim": "The repository does not establish precise timeout timing or termination of the subprocess or descendants.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:40-46,77-101; local subprocess documentation inspected confirms timeout exception behavior but not process termination details.",
+          "dependency_id": "D3"
+        },
+        {
+          "claim": "No files were modified and no tests were run by the answer author.",
+          "verdict": "unsupported",
+          "evidence": "The answer author's prior actions cannot be established from repository source or Git state.",
+          "dependency_id": null
+        }
+      ],
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6"
+      ],
+      "required_dependency_ids_missed": [
+        "D7",
+        "D8"
+      ],
+      "critical_omissions": [
+        "Does not state that retry invokes run_codex again with the same ExecutionInput, so the timeout metadata remains unchanged.",
+        "Describes the retry max-cycle path but omits the repair handler's counter updates and how repair transitions can also lead to the max-cycle stop."
+      ],
+      "invented_or_unsupported_edges": [],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [],
+      "coverage_note": "The timeout and stuck-loop analysis is accurate. The recovery description omits timeout preservation across retries and the repair transition's effect on the cycle path."
+    }
+  ],
+  "runtime_or_dynamic_notes": [
+    "Checked-in control flow establishes the timeout value selection, its passage as subprocess.run's timeout argument, and the result construction if TimeoutExpired is raised. It does not contain an explicit process-termination or process-group call.",
+    "Read-only local Python subprocess.run and TimeoutExpired documentation was inspected. It says a supplied timeout can raise TimeoutExpired while waiting for a child process. The documentation inspected did not establish what happens to the child or its descendants after timeout, so no termination behavior is asserted.",
+    "Timeout handling, elapsed-time values, process scheduling, and any operating-system process behavior beyond the checked-in calls are runtime-dependent."
+  ],
+  "validation_limitations": [
+    "No tests were run, as instructed. The tracked repository has no test files.",
+    "Runtime documentation evidence was limited to the local Python subprocess docstrings; no Python or operating-system process-termination behavior was inferred from undocumented details.",
+    "Claims about what the anonymized answer authors did, such as whether they ran tests or modified files, cannot be verified from repository source."
+  ]
+}

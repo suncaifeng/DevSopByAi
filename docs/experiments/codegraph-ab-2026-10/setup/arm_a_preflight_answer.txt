@@ -1,0 +1,7 @@
+Tracked source and documentation filenames at the repository root:
+
+- `codex_run.py`
+- `contracts.py`
+- `main.py`
+- `routing_system.py`
+- `开发SOP流程与提示词.md`

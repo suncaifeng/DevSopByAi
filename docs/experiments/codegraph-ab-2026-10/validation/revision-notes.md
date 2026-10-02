@@ -1,0 +1,3 @@
+# Validation revision note
+
+The first blind validation was superseded before final metric aggregation. Its input sanitizer replaced the substring `codegraph` inside the checked-in TaskContract filename, making that valid citation appear nonexistent to validators. Original revision 1 inputs, arm map, validator outputs, and run records are preserved in `validation/round1/`. Revision 2 rebuilds all blinded copies from the unchanged original measured answers, masks tool-provenance wording while preserving every tracked repository path verbatim, and uses newly randomized X/Y labels. Four fresh independent validator sessions will produce the final validation results. No measured subject answer or measured session was rerun.

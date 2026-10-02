@@ -1,0 +1,388 @@
+{
+  "benchmark_id": "Q3",
+  "source_ground_truth": "At HEAD 37bc219ae4f5989d0bfaf6bfb917ae86108d33e1, the tracked tree contains four Python files and three Markdown files; git status is clean. contracts.py:ExecutionErrorType:11-19 declares the current Literal values. ExecutionResult.error_type and RouteDecision.source_error_type use it, and OrchestratorState stores ExecutionResult objects in last_execution and history (contracts.py:95-128). validate_execution_result checks status/error consistency, exit code, and test-result consistency, but has no allowed-value membership check; validate_route_decision likewise does not check source_error_type membership (contracts.py:231-267). codex_run.py:run_codex:22-119 assigns NONE on success, calls classify_error for nonzero subprocess exits, and assigns CODEX_ERROR or ENV_ERROR in timeout and missing-command handlers. classify_error uses ordered text checks and returns only existing categories or UNKNOWN (codex_run.py:180-211). _build_summary interpolates the error value (codex_run.py:214-217). routing_system.py:route_decision:19-118 handles success first, then DSL blockers, stuck loops, named error categories, and finally FATAL for an unmatched category; _detect_stuck_loop and _route_stuck_loop compare repeated categories and send unlisted repeated categories to FATAL (routing_system.py:142-171). main.py:main:21-76 validates, records, routes, and acts on results. contracts.py:to_dict:131-132 uses dataclasses.asdict, with no in-repository call site. codex_run.py:_write_temp_spec:126-155 writes input DSL, validator data, and metadata, not ExecutionResult; there is no result parser or deserializer. No separate execution-error schema, tests, or documentation defining this taxonomy is tracked. Task documents discuss analysis categories and MCP/config failure as benchmark instructions; the SOP discusses generic error handling, not these error values.",
+  "required_dependencies": [
+    {
+      "id": "Q3-D1",
+      "file": "contracts.py",
+      "symbol": "ExecutionErrorType",
+      "critical": true,
+      "description": "The Literal declaration whose allowed values are being expanded.",
+      "source_evidence": "contracts.py:ExecutionErrorType:11-19"
+    },
+    {
+      "id": "Q3-D2",
+      "file": "contracts.py",
+      "symbol": "ExecutionResult.error_type; RouteDecision.source_error_type; OrchestratorState.last_execution/history",
+      "critical": true,
+      "description": "Typed result, decision, and history fields through which the error value is carried.",
+      "source_evidence": "contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115; contracts.py:OrchestratorState:118-128"
+    },
+    {
+      "id": "Q3-D3",
+      "file": "contracts.py",
+      "symbol": "validate_execution_result",
+      "critical": true,
+      "description": "Checks status/error consistency and other result invariants without enumerating allowed error values.",
+      "source_evidence": "contracts.py:validate_execution_result:231-249"
+    },
+    {
+      "id": "Q3-D4",
+      "file": "codex_run.py",
+      "symbol": "run_codex",
+      "critical": true,
+      "description": "Produces ExecutionResult values and selects the classifier or direct exception categories.",
+      "source_evidence": "codex_run.py:run_codex:22-75; codex_run.py:run_codex:77-119"
+    },
+    {
+      "id": "Q3-D5",
+      "file": "codex_run.py",
+      "symbol": "classify_error",
+      "critical": true,
+      "description": "Text classifier for nonzero process exits; it currently has no MCP-specific category.",
+      "source_evidence": "codex_run.py:classify_error:180-211"
+    },
+    {
+      "id": "Q3-D6",
+      "file": "routing_system.py",
+      "symbol": "route_decision",
+      "critical": true,
+      "description": "Maps status, blockers, and known error categories to routes; unmatched failed-result categories reach the FATAL fallback when earlier conditions do not apply.",
+      "source_evidence": "routing_system.py:route_decision:19-118"
+    },
+    {
+      "id": "Q3-D7",
+      "file": "routing_system.py",
+      "symbol": "_detect_stuck_loop; _route_stuck_loop",
+      "critical": true,
+      "description": "Detects repeated error values and routes repeated categories outside the special repair set to FATAL.",
+      "source_evidence": "routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171"
+    },
+    {
+      "id": "Q3-D8",
+      "file": "main.py",
+      "symbol": "main",
+      "critical": true,
+      "description": "Validates and records each result, invokes routing, and carries out the selected route.",
+      "source_evidence": "main.py:main:21-76"
+    },
+    {
+      "id": "Q3-D9",
+      "file": "contracts.py",
+      "symbol": "validate_route_decision",
+      "critical": false,
+      "description": "Validates route-decision confidence, reason, and route/spec-change consistency, but not source_error_type membership.",
+      "source_evidence": "contracts.py:validate_route_decision:252-267"
+    },
+    {
+      "id": "Q3-D10",
+      "file": "contracts.py",
+      "symbol": "to_dict",
+      "critical": false,
+      "description": "Generic dataclass serializer that can carry the string value if called; no repository caller is present.",
+      "source_evidence": "contracts.py:to_dict:131-132"
+    },
+    {
+      "id": "Q3-D11",
+      "file": "codex_run.py",
+      "symbol": "_write_temp_spec",
+      "critical": false,
+      "description": "Relevant serialization check: this writes an input spec, not an ExecutionResult serializer.",
+      "source_evidence": "codex_run.py:_write_temp_spec:126-155"
+    },
+    {
+      "id": "Q3-D12",
+      "file": "codex_run.py",
+      "symbol": "_build_summary",
+      "critical": false,
+      "description": "Interpolates the error category into the failure summary.",
+      "source_evidence": "codex_run.py:_build_summary:214-217"
+    }
+  ],
+  "tests_or_absent": "No test files are tracked, so there are no in-repository tests to update or inspect; no tests were run. No separate execution-error schema, result parser/deserializer, or result JSON reader is present. to_dict has no in-repository call site. The only nearby JSON writer serializes the input spec, not ExecutionResult. The SOP and task documents do not define this error taxonomy.",
+  "answer_evaluations": [
+    {
+      "answer_id": "R1-X",
+      "verdict": "partial",
+      "claims": [
+        {
+          "claim": "The Literal declaration, typed result/decision/state fields, classifier return type, and router parameter are the named source surfaces.",
+          "verdict": "correct",
+          "evidence": "contracts.py:ExecutionErrorType:11-19; contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115; contracts.py:OrchestratorState:118-128; codex_run.py:classify_error:180; routing_system.py:_detect_stuck_loop:142",
+          "dependency_id": "Q3-D1"
+        },
+        {
+          "claim": "Result validation enforces status/error and other result consistency but does not enforce error-value membership; route-decision validation has no source_error_type membership check.",
+          "verdict": "correct",
+          "evidence": "contracts.py:validate_execution_result:231-249; contracts.py:validate_route_decision:252-267",
+          "dependency_id": "Q3-D3"
+        },
+        {
+          "claim": "The runner classifies nonzero output through existing text branches, while timeout and missing-command catches assign existing categories.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:53-60; codex_run.py:run_codex:77-119; codex_run.py:classify_error:180-211",
+          "dependency_id": "Q3-D5"
+        },
+        {
+          "claim": "Routing checks success and DSL blockers before named categories; an unmatched new category falls through to FATAL, and a repeated unlisted category is also fatal.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "Q3-D6"
+        },
+        {
+          "claim": "The repository inventory contains three Python files and three Markdown files.",
+          "verdict": "false",
+          "evidence": "git ls-files at the specified HEAD lists codex_run.py, contracts.py, main.py, and routing_system.py (four Python files), plus three Markdown files.",
+          "dependency_id": null
+        },
+        {
+          "claim": "The generic serializer, input-spec writer, summary interpolation, documentation scope, and absence of tests/schema/result parser are described accurately.",
+          "verdict": "correct",
+          "evidence": "contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_summary:214-217; tracked files; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:557-562,1236-1246",
+          "dependency_id": "Q3-D10"
+        }
+      ],
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8",
+        "Q3-D9",
+        "Q3-D10",
+        "Q3-D11",
+        "Q3-D12"
+      ],
+      "required_dependency_ids_missed": [],
+      "critical_omissions": [],
+      "invented_or_unsupported_edges": [],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [
+        "The docs/task link label contains a retrieval-system placeholder even though its target is the checked-in task document."
+      ],
+      "coverage_note": "Broad coverage of direct and indirect impact, with the repository file-count error. It explicitly identifies absent tests, schema, parser, and taxonomy documentation."
+    },
+    {
+      "answer_id": "R1-Y",
+      "verdict": "partial",
+      "claims": [
+        {
+          "claim": "A retrieval-system importedBy query returned no edges for contracts.py, while the named source imports exist.",
+          "verdict": "unsupported",
+          "evidence": "The imports are source-confirmed at codex_run.py:10-16, routing_system.py:3-13, and main.py:6-18; the reported graph-query result cannot be established from repository source and is disallowed as ground truth.",
+          "dependency_id": null
+        },
+        {
+          "claim": "ExecutionErrorType is a Literal used by ExecutionResult.error_type and RouteDecision.source_error_type.",
+          "verdict": "correct",
+          "evidence": "contracts.py:ExecutionErrorType:11-19; contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115",
+          "dependency_id": "Q3-D2"
+        },
+        {
+          "claim": "The runner's nonzero-exit classifier and exception handlers emit only existing categories, while result validation has no allowed-value membership branch.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:53-60,77-119; codex_run.py:classify_error:180-211; contracts.py:validate_execution_result:231-249",
+          "dependency_id": "Q3-D4"
+        },
+        {
+          "claim": "With no earlier blocking or stuck-loop condition, an unhandled error category falls back to FATAL; repeated categories outside the repair set also route to FATAL.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:42-118; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "Q3-D6"
+        },
+        {
+          "claim": "The orchestrator records results before routing; to_dict is generic with no repository caller, and the JSON writer does not serialize ExecutionResult.",
+          "verdict": "correct",
+          "evidence": "main.py:main:36-45; contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; repository search finds only the to_dict definition.",
+          "dependency_id": "Q3-D8"
+        },
+        {
+          "claim": "The tracked tree has no tests or separate schema/result parser, and the cited docs do not define the error taxonomy.",
+          "verdict": "correct",
+          "evidence": "git ls-files at HEAD; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:24-28,557-562",
+          "dependency_id": null
+        }
+      ],
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8",
+        "Q3-D10",
+        "Q3-D11",
+        "Q3-D12"
+      ],
+      "required_dependency_ids_missed": [
+        "Q3-D9"
+      ],
+      "critical_omissions": [],
+      "invented_or_unsupported_edges": [
+        "The reported importedBy query result relies on external graph output; the actual imports are independently confirmed by source."
+      ],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [
+        "The ExecutionResult.error_type and RouteDecision.source_error_type citations point to contracts.py:96 and :108, which are class declaration lines; the field declarations are at :99 and :114."
+      ],
+      "coverage_note": "The source-based impact map is broad. It omits validate_route_decision's lack of source_error_type membership checking and includes graph-query provenance that cannot serve as evidence under the instructions."
+    },
+    {
+      "answer_id": "R2-X",
+      "verdict": "complete",
+      "claims": [
+        {
+          "claim": "The declaration, typed fields, result validation, and route-decision validation behave as described; neither validator checks error-type membership.",
+          "verdict": "correct",
+          "evidence": "contracts.py:ExecutionErrorType:11-19; contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115; contracts.py:validate_execution_result:231-249; contracts.py:validate_route_decision:252-267",
+          "dependency_id": "Q3-D3"
+        },
+        {
+          "claim": "run_codex uses classify_error for nonzero process exits and assigns existing values for timeout and missing-command exceptions; the classifier has no MCP-specific branch.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:53-60,77-119; codex_run.py:classify_error:180-211",
+          "dependency_id": "Q3-D5"
+        },
+        {
+          "claim": "Named router branches, blocking-state precedence, default FATAL handling, and repeated-error handling for a new category are described accurately.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "Q3-D6"
+        },
+        {
+          "claim": "The orchestrator validates and records results before routing, and updates counters or stops according to route outcomes.",
+          "verdict": "correct",
+          "evidence": "main.py:main:36-73; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-112",
+          "dependency_id": "Q3-D8"
+        },
+        {
+          "claim": "to_dict is generic and has no in-repository caller; the input JSON writer is not an ExecutionResult serializer; there is no result parser or separate schema/test file; documentation does not define this taxonomy.",
+          "verdict": "correct",
+          "evidence": "contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; git ls-files at HEAD; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:557-562,1236-1246",
+          "dependency_id": "Q3-D10"
+        },
+        {
+          "claim": "Whether external CLI diagnostics contain an MCP startup failure and how those diagnostics classify is not established by this source.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:_build_codex_command:158-164; codex_run.py:run_codex:40-54; codex_run.py:classify_error:180-211",
+          "dependency_id": "Q3-D5"
+        }
+      ],
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8",
+        "Q3-D9",
+        "Q3-D10",
+        "Q3-D11"
+      ],
+      "required_dependency_ids_missed": [
+        "Q3-D12"
+      ],
+      "critical_omissions": [],
+      "invented_or_unsupported_edges": [],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [
+        "The Markdown citations for validate_execution_result and validate_route_decision contain a space after the link parenthesis, making those citation links malformed."
+      ],
+      "coverage_note": "Covers all critical source dependencies and the required absence/runtime boundaries. It does not mention _build_summary, a noncritical direct consumer."
+    },
+    {
+      "answer_id": "R2-Y",
+      "verdict": "partial",
+      "claims": [
+        {
+          "claim": "The change as posed only widens the Literal annotation and, by itself, does not add an emitting classifier branch or new routing branch.",
+          "verdict": "correct",
+          "evidence": "contracts.py:ExecutionErrorType:11-19; codex_run.py:classify_error:180-211; routing_system.py:route_decision:54-118",
+          "dependency_id": "Q3-D1"
+        },
+        {
+          "claim": "Result validation checks status/error consistency and other invariants without membership checking; a failed new category passes those error-type conditions while a successful one fails them.",
+          "verdict": "correct",
+          "evidence": "contracts.py:validate_execution_result:231-249",
+          "dependency_id": "Q3-D3"
+        },
+        {
+          "claim": "The runner and classifier behavior, including timeout/missing-command handling, is accurately described.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:run_codex:53-60,77-119; codex_run.py:classify_error:180-211",
+          "dependency_id": "Q3-D5"
+        },
+        {
+          "claim": "The router's blocker precedence, unmatched-category fallback, and repeated-category fatal path are accurately described with the stated conditions.",
+          "verdict": "correct",
+          "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_route_stuck_loop:152-171",
+          "dependency_id": "Q3-D6"
+        },
+        {
+          "claim": "The main loop validates, records, routes, and stops on FATAL; the generic serializer, input JSON writer, and test-output extractor do not provide a result parser.",
+          "verdict": "correct",
+          "evidence": "main.py:main:36-73; contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; codex_run.py:_extract_test_result:229-243",
+          "dependency_id": "Q3-D8"
+        },
+        {
+          "claim": "The reported retrieval-system related-test query returned zero.",
+          "verdict": "unsupported",
+          "evidence": "This query output is not repository evidence and cannot be used as ground truth; independently, git ls-files at HEAD shows no tracked test files.",
+          "dependency_id": null
+        },
+        {
+          "claim": "The tracked inventory lacks separate schema and test files, and the cited docs do not define the error taxonomy.",
+          "verdict": "correct",
+          "evidence": "git ls-files at HEAD; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:24-28,557-562",
+          "dependency_id": null
+        },
+        {
+          "claim": "The source does not establish whether an external command starts an MCP server or what diagnostics it emits; text classification therefore remains runtime-dependent.",
+          "verdict": "correct",
+          "evidence": "codex_run.py:_build_codex_command:158-164; codex_run.py:run_codex:40-54; codex_run.py:classify_error:180-211",
+          "dependency_id": "Q3-D5"
+        }
+      ],
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8",
+        "Q3-D10",
+        "Q3-D11",
+        "Q3-D12"
+      ],
+      "required_dependency_ids_missed": [
+        "Q3-D9"
+      ],
+      "critical_omissions": [],
+      "invented_or_unsupported_edges": [
+        "The related-test query result is external graph output and is unsupported; the source-tree inventory independently confirms no tracked tests."
+      ],
+      "unsupported_runtime_claims": [],
+      "citation_issues": [
+        "The retrieval-system test-query assertion has no admissible repository citation."
+      ],
+      "coverage_note": "The source-grounded impact map is strong but omits validate_route_decision's lack of source_error_type membership checking and reports a prohibited graph-query result."
+    }
+  ],
+  "runtime_or_dynamic_notes": [
+    "The checked-in classifier consumes external subprocess stdout/stderr using ordered substring checks. An MCP startup diagnostic could match one of the existing generic branches or fall through to UNKNOWN; the repository does not establish the diagnostic wording or MCP startup behavior.",
+    "Adding the Literal value alone supplies no producer branch. An external caller could construct an ExecutionResult containing that string, but out-of-checkout callers and consumers are unknown."
+  ],
+  "validation_limitations": [
+    "The specified HEAD was verified and the working tree was clean. Only this detached repository worktree was inspected.",
+    "No tests or runtime commands were run, as instructed. No external graph output or source was used to establish ground truth."
+  ]
+}

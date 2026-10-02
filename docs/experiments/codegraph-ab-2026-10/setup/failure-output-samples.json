@@ -1,0 +1,53 @@
+{
+  "evidence_source": "Codex JSONL event traces stored outside Git; extracted text is sanitized and limited to graph failure outputs.",
+  "samples": [
+    {
+      "run_id": "Q1-R2-B",
+      "tool": "codegraph_get_call_graph",
+      "arguments": {
+        "uri": "file:///tmp/devsopbyai-codegraph-ab-index-20261002/codex_run.py",
+        "line": 22,
+        "direction": "callees",
+        "depth": 3,
+        "summary": true
+      },
+      "result_excerpt": "{\"summary\":{\"callee_count\":0,\"caller_count\":0,\"depth\":3,\"direction\":\"callees\"},\"symbol\":{\"col_end\":10000,\"col_start\":0,\"depth\":0,\"id\":\"42\",\"language\":\"\",\"line_end\":123,\"line_start\":22,\"name\":\"run_codex\",\"path\":\"/tmp/devsopbyai-codegraph-ab-index-20261002/codex_run.py\",\"signature\":\"run_codex\"}}"
+    },
+    {
+      "run_id": "Q1-R2-B",
+      "tool": "codegraph_get_call_graph",
+      "arguments": {
+        "uri": "file:///tmp/devsopbyai-codegraph-ab-index-20261002/routing_system.py",
+        "line": 19,
+        "direction": "callees",
+        "depth": 4,
+        "summary": true
+      },
+      "result_excerpt": "{\"summary\":{\"callee_count\":0,\"caller_count\":0,\"depth\":4,\"direction\":\"callees\"},\"symbol\":{\"col_end\":10000,\"col_start\":0,\"depth\":0,\"id\":\"1\",\"language\":\"\",\"line_end\":118,\"line_start\":19,\"name\":\"route_decision\",\"path\":\"/tmp/devsopbyai-codegraph-ab-index-20261002/routing_system.py\",\"signature\":\"route_decision\"}}"
+    },
+    {
+      "run_id": "Q4-R1-B",
+      "tool": "codegraph_get_call_graph",
+      "arguments": {
+        "uri": "file:///tmp/devsopbyai-codegraph-ab-measured-worktrees-20261002/Q4-R1-B-attempt1/main.py",
+        "line": 20,
+        "direction": "both",
+        "depth": 4,
+        "summary": false
+      },
+      "result_excerpt": "{\"edges\":[],\"message\":\"Could not find symbol at location\",\"nodes\":[]}"
+    },
+    {
+      "run_id": "Q4-R1-B",
+      "tool": "codegraph_get_call_graph",
+      "arguments": {
+        "uri": "file:///tmp/devsopbyai-codegraph-ab-measured-worktrees-20261002/Q4-R1-B-attempt1/codex_run.py",
+        "line": 157,
+        "direction": "both",
+        "depth": 4,
+        "summary": false
+      },
+      "result_excerpt": "{\"edges\":[],\"message\":\"Could not find symbol at location\",\"nodes\":[]}"
+    }
+  ]
+}

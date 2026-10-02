@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"01a0fa8d-4dbd-7633-8048-d9f17403d7a4"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"I’ll locate the available CodeGraph entry point and use one discovery call, without reading or changing repository files."}}
+{"type":"item.started","item":{"id":"item_1","type":"mcp_tool_call","server":"codegraph","tool":"codegraph_find_entry_points","arguments":{"entryType":"all","limit":50},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_1","type":"mcp_tool_call","server":"codegraph","tool":"codegraph_find_entry_points","arguments":{"entryType":"all","limit":50},"result":null,"error":{"message":"MCP tool call requires approval, but approval policy is never"},"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"Called `mcp__codegraph__codegraph_find_entry_points`. The call was blocked because it requires approval and the approval policy is `never`, so it returned no paths or symbols. I did not read or change files."}}
+{"type":"turn.completed","usage":{"input_tokens":48134,"cached_input_tokens":30976,"cache_write_input_tokens":0,"output_tokens":591,"reasoning_output_tokens":429}}

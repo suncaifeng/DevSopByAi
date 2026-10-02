@@ -1,0 +1,2723 @@
+{
+  "schema_version": "1.0",
+  "validation_revision": 2,
+  "status": "COMPLETE",
+  "final_revision_used_for_metrics": 2,
+  "revision_1_superseded": {
+    "path": "validation/round1/",
+    "reason": "First sanitizer changed CODEGRAPH inside the tracked TaskContract filename, creating false missing-file citation findings. Revision 2 preserved tracked paths and used four new fresh validators; no measured answer was rerun."
+  },
+  "blinding": {
+    "status": "PASS",
+    "validator_contexts": 4,
+    "one_fresh_validator_per_benchmark": true,
+    "benchmark_head": "37bc219ae4f5989d0bfaf6bfb917ae86108d33e1",
+    "mcp_config": "none",
+    "arm_map_not_provided_to_validators": true,
+    "anonymous_labels_randomized_independently_by_benchmark_repeat": true,
+    "validator_input_hashes": {
+      "Q1.json": "57697b60ce86789d6ac1b6677dbbf0750b4acd2a058af57166dcc6a1546e680d",
+      "Q2.json": "90e8f31a51f955e1686fc9daf77a44596463597060622e2969db0c4496dc2c36",
+      "Q3.json": "0e9f38bd5f41ffc349f7daea39994b18d00d89ed4af71fbb9da381d882377aad",
+      "Q4.json": "f3064299aaa7ebfc82a60f14be9a2427daa6bc13c4155a6aa983f71429709331"
+    }
+  },
+  "validators": {
+    "Q1": {
+      "benchmark_id": "Q1",
+      "source_ground_truth": "At commit 37bc219ae4f5989d0bfaf6bfb917ae86108d33e1, the public Python entry point is main.main(execution_input) in main.py:21. It calls contracts.validate_execution_input before creating OrchestratorState; then loops, calls codex_run.run_codex, validates the result, appends it to history, calls routing_system.route_decision, validates the decision, and applies its route. The checked-in __main__ guard exits with instructions to construct ExecutionInput and call main directly (main.py:118-122). The tracked tree has no CLI/API wrapper or in-repository caller of main.\n\nThe adapter writes a temporary JSON spec, builds either the metadata-supplied command plus --spec or the default codex exec --spec command, and calls subprocess.run with workspace.root as cwd, captured text output, and a timeout (codex_run.py:36-46, 126-170). A normal return uses the exit code for SUCCESS/FAILED; failures are classified from output text. Logs, heuristic test signals, raw run data, and an empty changed_files list are returned. Timeout and FileNotFoundError have separate result branches, and the temporary spec is cleaned up in finally (codex_run.py:48-123, 173-243). The FileNotFoundError handler is source-confirmed; the source alone does not establish which underlying operation caused a particular runtime exception.\n\nRouting checks SUCCESS first, then DSL blocking state, then the stuck-loop detector, then error-specific branches (routing_system.py:33-118). Blocking state includes blocking markers, DSL_BLOCKED or REPAIR_BLOCKED statuses, and BLOCKERS or UNRESOLVED_ISSUES values not considered NONE by contracts.is_none_section (routing_system.py:121-139; contracts.py:135-149). This is broader than checking only nonempty lists. The stuck-loop detector reads the last two history entries and appends the current error; since main appends the current result before calling the router, two identical consecutive failed executions can satisfy its three-item comparison (main.py:39-42; routing_system.py:142-149).\n\nRetry and repair decisions use contracts.can_retry_codex and contracts.can_repair_spec in both the router and main's route helpers (routing_system.py:54-94, 180-219; main.py:91-110; contracts.py:270-281). Retry increments retry and cycle counts. Repair increments repair, spec_version, and cycle counts, but the repair hook is explicitly unimplemented; the adapter serializes execution_input.dsl, and main does not replace that input DSL. REGENERATE_SPEC, ASK_USER, FATAL, and SUCCESS return state; unknown routes raise ValueError; exhausting the cycle loop also returns state (main.py:48-76, 102-115). ASK_USER is declared and handled, but route_decision does not emit it.\n\nThe adapter infers test status from output text; it does not invoke a separate test runner (codex_run.py:229-243). Result validation checks that tests.passed is not None when tests.ran is true, but does not perform a runtime boolean-type check (contracts.py:231-249). No tests or other in-repository consumers of main are present in the tracked tree.",
+      "required_dependencies": [
+        {
+          "id": "D1",
+          "file": "contracts.py",
+          "symbol": "validate_execution_input",
+          "critical": true,
+          "description": "main calls this before state initialization or execution dispatch; it gates readiness, DSL, workspace-root, and run-policy validation.",
+          "source_evidence": "main.py:main:21-24 calls contracts.validate_execution_input; contracts.py:validate_execution_input:200-228"
+        },
+        {
+          "id": "D2",
+          "file": "codex_run.py",
+          "symbol": "run_codex",
+          "critical": true,
+          "description": "main dispatches each execution cycle to this adapter.",
+          "source_evidence": "main.py:main:36; codex_run.py:run_codex:22-75"
+        },
+        {
+          "id": "D3",
+          "file": "contracts.py",
+          "symbol": "validate_execution_result",
+          "critical": true,
+          "description": "main validates each adapter result before saving it or routing it.",
+          "source_evidence": "main.py:_validate_or_stop_result:79-82; contracts.py:validate_execution_result:231-249"
+        },
+        {
+          "id": "D4",
+          "file": "routing_system.py",
+          "symbol": "route_decision",
+          "critical": true,
+          "description": "main passes the result, state, and input to this routing function after recording the result.",
+          "source_evidence": "main.py:main:39-43; routing_system.py:route_decision:19-118"
+        },
+        {
+          "id": "D5",
+          "file": "contracts.py",
+          "symbol": "validate_route_decision",
+          "critical": true,
+          "description": "main validates each routing result before applying its route.",
+          "source_evidence": "main.py:_validate_or_stop_decision:85-88; contracts.py:validate_route_decision:252-267"
+        },
+        {
+          "id": "D6",
+          "file": "contracts.py",
+          "symbol": "can_retry_codex and can_repair_spec",
+          "critical": true,
+          "description": "main's retry and repair handlers use these cross-file budget checks before incrementing counters.",
+          "source_evidence": "main.py:_apply_retry_code_route:91-110; contracts.py:can_retry_codex:270-274; contracts.py:can_repair_spec:277-281"
+        },
+        {
+          "id": "D7",
+          "file": "contracts.py",
+          "symbol": "can_retry_codex and can_repair_spec",
+          "critical": true,
+          "description": "routing_system uses the shared budget checks to choose retry, repair, regeneration, or failure routes.",
+          "source_evidence": "routing_system.py:route_decision:54-94; routing_system.py:_repair_or_regenerate:174-195; routing_system.py:_repair_or_fail:198-219; contracts.py:can_retry_codex:270-274; contracts.py:can_repair_spec:277-281"
+        },
+        {
+          "id": "D8",
+          "file": "contracts.py",
+          "symbol": "contains_blocking_marker and is_none_section",
+          "critical": true,
+          "description": "routing_system uses these contract helpers to evaluate DSL blocking markers, blockers, and unresolved issues.",
+          "source_evidence": "routing_system.py:_dsl_has_blocking_state:121-139; contracts.py:contains_blocking_marker:139-149; contracts.py:is_none_section:135-136"
+        },
+        {
+          "id": "D9",
+          "file": "contracts.py",
+          "symbol": "ExecutionInput, OrchestratorState, ExecutionResult, TestResult, RouteDecision",
+          "critical": true,
+          "description": "These data contracts carry input, execution evidence, orchestration history, and route decisions across the adapter, main loop, and router.",
+          "source_evidence": "contracts.py:ExecutionInput:78-85; contracts.py:ExecutionResult:95-105; contracts.py:RouteDecision:107-115; contracts.py:OrchestratorState:118-129; codex_run.py:10-16, 56-75"
+        }
+      ],
+      "tests_or_absent": "No tests are checked into this commit: the tracked tree contains the four Python modules, documentation files, and no test files. The only Python matches for test-related names are adapter test-signal extraction/classification code. No in-repository caller of main was found; main.py's direct-execution guard is the only checked-in direction for invoking it.",
+      "answer_evaluations": [
+        {
+          "answer_id": "R1-X",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "main(execution_input) is the callable entry point; the guard disables direct demo execution, and the tracked checkout has no CLI/API wrapper constructing the input.",
+              "verdict": "correct",
+              "evidence": "main.py:main:21; main.py:__main__:118-122; tracked file inventory and source search show no wrapper or caller.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "Input validation precedes state creation and dispatch; it checks readiness, DSL requirements, workspace root, and run-policy limits, not allowed/denied paths or root existence.",
+              "verdict": "correct",
+              "evidence": "main.py:main:22-29; contracts.py:validate_execution_input:200-228; no allowed_paths/denied_paths or existence check appears there; codex_run.py:run_codex:40-46 uses root as cwd.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "The loop dispatches to run_codex, validates and records the result, calls route_decision, and validates the route.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-45; main.py:_validate_or_stop_result:79-82; main.py:_validate_or_stop_decision:85-88.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "Result validation requires tests.passed to be a boolean whenever tests.ran is true.",
+              "verdict": "false",
+              "evidence": "contracts.py:validate_execution_result:246-247 rejects only tests.passed is None; it does not check isinstance(..., bool).",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "run_codex writes the temporary spec and invokes subprocess.run with workspace cwd, captured text output, and configured/default timeout; command override and default are described correctly.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:36-46; codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_codex_command:158-164; codex_run.py:_timeout_seconds:166-170.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "Normal results contain compacted logs, an inferred test signal, raw run fields, and empty changed_files; timeout and FileNotFoundError branches return failed results, and cleanup is attempted in finally.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-123; codex_run.py:_cleanup_temp_spec:173-177; codex_run.py:_extract_test_result:229-243.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "Routing checks success first, then DSL blocking state, stuck-loop state, and error-specific branches; main returns or continues according to the route and cycle limit.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; main.py:main:48-76.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The stuck-loop inference can be satisfied by two consecutive identical failures because main records the current result before the detector appends that error again.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "Repair increments counters but does not replace execution_input.dsl in the checked-in path; the result/history is returned in memory without a separate persistent writer.",
+              "verdict": "correct",
+              "evidence": "main.py:_apply_repair_spec_route:102-112; codex_run.py:_write_temp_spec:126-149; contracts.py:OrchestratorState:118-129; no result-file writer exists in the tracked orchestration modules.",
+              "dependency_id": "D2"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not identify the router's direct contracts.py predicate dependencies contains_blocking_marker and is_none_section (D8)."
+          ],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [],
+          "coverage_note": "The execution path and major route branches are well covered. The result-validation claim overstates what the code enforces, and the router-to-contract blocking-predicate edge is not identified."
+        },
+        {
+          "answer_id": "R1-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The public call is main.main(ExecutionInput); direct execution exits with instructions to call it, and no checked-in CLI/API wrapper is identified.",
+              "verdict": "correct",
+              "evidence": "main.py:main:21; main.py:__main__:118-122; tracked file inventory contains no wrapper.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "Input validation gates state creation and dispatch, and checks the PASS/readiness, DSL, root, and run-policy constraints described.",
+              "verdict": "correct",
+              "evidence": "main.py:main:22-29; contracts.py:validate_execution_input:200-228; contracts.py:validate_dsl_candidate:152-197.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "main dispatches to run_codex, validates and records the result, routes it, then validates and stores the decision.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-46.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "Result validation requires a boolean tests.passed value when tests.ran is true.",
+              "verdict": "false",
+              "evidence": "contracts.py:validate_execution_result:246-247 only checks that tests.passed is not None.",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "The adapter serializes the DSL, selected validator fields, and metadata, constructs the override/default command, and passes cwd, output-capture, text, and timeout options to subprocess.run.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_codex_command:158-164; codex_run.py:_timeout_seconds:166-170; codex_run.py:run_codex:40-46.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "Normal, timeout, and FileNotFoundError result branches capture the described evidence, set changed_files empty, and clean up the temporary spec.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-123; codex_run.py:_cleanup_temp_spec:173-177.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "Error classification checks test, spec-conflict, validation, environment, then runtime signals and falls back to UNKNOWN; test evidence is inferred from output.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:classify_error:180-212; codex_run.py:_extract_test_result:229-243.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "The router prioritizes success, then blocking DSL state, then stuck-loop handling, followed by error-specific branches; main applies route returns and counter updates.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; main.py:main:48-76; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-112.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The stuck-loop comparison can count the current failure twice after main appends it to history before routing.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The repair hook is unimplemented and does not replace the input DSL; no separate persistent result writer is present in the inspected path.",
+              "verdict": "correct",
+              "evidence": "main.py:_apply_repair_spec_route:102-112; codex_run.py:_write_temp_spec:126-149; no result-file write appears in the tracked orchestration modules.",
+              "dependency_id": "D2"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D6",
+            "D7",
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not identify main's direct calls to contracts.can_retry_codex and contracts.can_repair_spec (D6).",
+            "Does not identify the router's direct budget-helper dependencies (D7).",
+            "Does not identify the router's direct contracts.py blocking-predicate dependencies (D8)."
+          ],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [],
+          "coverage_note": "The narrative covers the major behavior and source branches, but omits several direct contracts.py helper dependencies and overstates the test-result validator's runtime check."
+        },
+        {
+          "answer_id": "R2-X",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "main(execution_input) is the public function; its module guard disables direct execution, and no CLI/API wrapper appears in the tracked Python files.",
+              "verdict": "correct",
+              "evidence": "main.py:main:21; main.py:__main__:118-122; tracked tree and source search show no wrapper.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "Validation occurs before state creation and requires the described readiness, DSL, root, and run-policy constraints.",
+              "verdict": "correct",
+              "evidence": "main.py:main:22-29; contracts.py:validate_execution_input:200-228.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "The main loop calls run_codex, validates and records its result, calls route_decision, and validates the route.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-45.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "The adapter writes the temporary spec, selects the override/default command, invokes subprocess.run with cwd/capture/text/timeout settings, and returns normal, timeout, or FileNotFoundError result shapes.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:36-123; codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_codex_command:158-164; codex_run.py:_timeout_seconds:166-170.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "Normal result status follows exit code; failure classification, test-signal estimation, compacted logs, raw fields, and temporary-spec cleanup are described correctly.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-75, 121-123; codex_run.py:classify_error:180-212; codex_run.py:_extract_test_result:229-243.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "Routing prioritizes success and DSL blockers before stuck-loop/error handling, with the listed type-specific branches; main returns or continues according to the route.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; main.py:main:48-76.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "Two consecutive same-type failures can satisfy the three-item stuck-loop comparison because the current result is already in history and is appended again by the detector.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "A zero exit code routes to success even if output-derived test evidence indicates failure; test parsing is separate from status selection.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:51-63; codex_run.py:_extract_test_result:229-243; routing_system.py:route_decision:33-40; contracts.py:validate_execution_result:246-247.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "Repair does not apply a replacement DSL in the checked-in path, and execution evidence is held in returned state rather than written by a separate result-file writer.",
+              "verdict": "correct",
+              "evidence": "main.py:_apply_repair_spec_route:102-112; codex_run.py:_write_temp_spec:126-149; contracts.py:OrchestratorState:118-129.",
+              "dependency_id": "D2"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not identify the router's direct contracts.py predicate dependencies contains_blocking_marker and is_none_section (D8)."
+          ],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [],
+          "coverage_note": "This is a strong source trace with supported inferences about loop detection, success precedence, and repair behavior. It omits the router-to-contract blocking-predicate dependency."
+        },
+        {
+          "answer_id": "R2-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The checked-in call path constructs an ExecutionInput and invokes main; no in-repository CLI/API wrapper or caller of main is present.",
+              "verdict": "correct",
+              "evidence": "main.py:main:21; main.py:__main__:118-122; tracked tree and source search show no caller or wrapper.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "The statement that a retrieval system identified the symbols and returned empty targeted callee summaries is evidence for discovery.",
+              "verdict": "unsupported",
+              "evidence": "No repository source or Git evidence establishes that external discovery claim; the validation instructions prohibit using external graph results as ground truth.",
+              "dependency_id": null
+            },
+            {
+              "claim": "Input validation, state initialization, dispatch, result recording, routing, and route validation occur in the described order.",
+              "verdict": "correct",
+              "evidence": "main.py:main:22-45.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "DSL validation permits DSL_BLOCKED while enforcing the described required sections and consistency conditions; workspace path lists are not consulted in this path.",
+              "verdict": "correct",
+              "evidence": "contracts.py:validate_dsl_candidate:152-197; contracts.py:WorkspacePolicy:63-68; contracts.py:validate_execution_input:200-228; codex_run.py:run_codex:40-46.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "The adapter writes the spec, chooses the metadata override or default command, applies the described timeout, and invokes subprocess.run with workspace cwd and captured text output.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_codex_command:158-164; codex_run.py:_timeout_seconds:166-170; codex_run.py:run_codex:40-46.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "Normal results are based on process exit code and include logs, inferred test status, raw fields, and empty changed_files; timeout and FileNotFoundError have dedicated result branches; cleanup errors are suppressed.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-123; codex_run.py:_cleanup_temp_spec:173-177; codex_run.py:_extract_test_result:229-243.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "The router checks success first, blocking DSL state next, then stuck-loop and error-specific branches; main applies route returns or counter updates.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; main.py:main:48-76; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-112.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The blocker check triggers on nonempty blockers or nonempty unresolved issues.",
+              "verdict": "false",
+              "evidence": "routing_system.py:_dsl_has_blocking_state:133-137 checks not is_none_section(value); contracts.py:is_none_section:135-136 recognizes only the string NONE, an empty list, or None. Other values such as an empty string or empty dict are treated as blocking.",
+              "dependency_id": "D8"
+            },
+            {
+              "claim": "The stuck-loop check may be satisfied by two consecutive matching failures after history append and current-error append.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "Repair increments counters but does not replace execution_input.dsl; ASK_USER is declared and handled by main but not emitted by route_decision; REGENERATE_SPEC returns control to an upstream pipeline.",
+              "verdict": "correct",
+              "evidence": "main.py:_apply_repair_spec_route:102-112; codex_run.py:_write_temp_spec:126-149; contracts.py:Route:20-27; main.py:main:61-67; routing_system.py:route_decision:33-118.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "A successful process with negative test text may still route to success because status is selected from exit code and the router checks SUCCESS first.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:51-63; codex_run.py:_extract_test_result:229-243; routing_system.py:route_decision:33-40.",
+              "dependency_id": "D4"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D6",
+            "D7",
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not identify main's direct calls to contracts.can_retry_codex and contracts.can_repair_spec (D6).",
+            "Does not identify routing_system's direct budget-helper dependencies (D7).",
+            "Does not identify routing_system's direct contracts.py blocking-predicate dependencies (D8)."
+          ],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The [retrieval-system] reference is not repository/Git evidence and its discovery claim is disallowed for this validation; the actual source call path was verified independently."
+          ],
+          "coverage_note": "The source trace covers the main flow and most conditions, but it omits direct contracts helper dependencies, inaccurately narrows the blocker predicate to nonempty values, and includes an unsupported external-discovery claim."
+        }
+      ],
+      "runtime_or_dynamic_notes": [
+        "No Python program, subprocess, or tests were run. Subprocess result branches are established from checked-in control flow, not observed runtime outcomes.",
+        "The adapter catches FileNotFoundError around spec creation and subprocess invocation; source inspection confirms the handler's result, but not that every occurrence would mean the Codex executable itself was missing.",
+        "This is benchmark Q1, so no Python standard-library runtime documentation was consulted."
+      ],
+      "validation_limitations": [
+        "Conclusions are limited to the supplied detached worktree at the specified commit; an external caller or upstream pipeline outside this checkout cannot be established.",
+        "The tracked tree has no test files, so no test-based corroboration is available."
+      ]
+    },
+    "Q2": {
+      "benchmark_id": "Q2",
+      "source_ground_truth": "The source defines a conditional path, not one actual failed run. `main.main` validates the `ExecutionInput`, creates `OrchestratorState`, calls `run_codex`, validates its result, assigns `last_execution` and appends it to history, then calls and validates `route_decision` before saving and applying the route (`main.py:main:21-45`). Input validation requires PASS, readiness, valid DSL structure, a workspace root, and in-range policy limits; it does not require DSL_READY (`contracts.py:validate_execution_input:200-228`). `run_codex` writes a temporary spec, builds a command, calls `subprocess.run`, and constructs an `ExecutionResult` for returned processes, timeouts, and FileNotFoundError; its `finally` attempts temporary-file cleanup (`codex_run.py:run_codex:36-123`). The router handles success first; for failures it checks DSL blockers, then stuck-loop status, then error type (`routing_system.py:route_decision:33-118`). Route application updates retry or repair counters in `main`; a repair hook is explicitly unimplemented. Exit status, output text, exceptions, input DSL, prior history, and policy determine the concrete route at runtime.",
+      "required_dependencies": [
+        {
+          "id": "D1",
+          "file": "contracts.py",
+          "symbol": "ExecutionInput; validate_execution_input",
+          "critical": true,
+          "description": "The input contract and gate used by main before entering the execution loop.",
+          "source_evidence": "contracts.py:ExecutionInput:79-84; contracts.py:validate_execution_input:200-228; main.py:main:21-24"
+        },
+        {
+          "id": "D2",
+          "file": "codex_run.py",
+          "symbol": "run_codex",
+          "critical": true,
+          "description": "The direct call from the orchestrator into the execution adapter, passing the input and state.",
+          "source_evidence": "main.py:main:36; codex_run.py:run_codex:22-46"
+        },
+        {
+          "id": "D3",
+          "file": "contracts.py",
+          "symbol": "ExecutionResult; TestResult",
+          "critical": true,
+          "description": "The adapter constructs the result contract for a returned process, timeout, or missing command; it does not itself update orchestrator state.",
+          "source_evidence": "codex_run.py:run_codex:53-75; codex_run.py:run_codex:77-119; contracts.py:ExecutionResult:95-104; contracts.py:TestResult:88-93"
+        },
+        {
+          "id": "D4",
+          "file": "contracts.py",
+          "symbol": "validate_execution_result",
+          "critical": true,
+          "description": "The result contract gate called before the result is stored or routed.",
+          "source_evidence": "main.py:_validate_or_stop_result:79-83; contracts.py:validate_execution_result:231-249"
+        },
+        {
+          "id": "D5",
+          "file": "contracts.py",
+          "symbol": "OrchestratorState",
+          "critical": true,
+          "description": "The state contract holds counters, last result and route, current DSL, and execution history; main appends the result before routing.",
+          "source_evidence": "contracts.py:OrchestratorState:118-128; main.py:main:26-27; main.py:main:39-42"
+        },
+        {
+          "id": "D6",
+          "file": "routing_system.py",
+          "symbol": "route_decision",
+          "critical": true,
+          "description": "The orchestrator passes the result, updated state/history, and input to the router to select a route.",
+          "source_evidence": "main.py:main:42; routing_system.py:route_decision:19-23"
+        },
+        {
+          "id": "D7",
+          "file": "contracts.py",
+          "symbol": "RouteDecision; can_retry_codex; can_repair_spec; contains_blocking_marker; is_none_section",
+          "critical": true,
+          "description": "The router returns the route contract and calls contract helpers for blocker checks and retry/repair eligibility.",
+          "source_evidence": "routing_system.py:route_decision:33-118; routing_system.py:_dsl_has_blocking_state:121-139; routing_system.py:_repair_or_regenerate:174-195; routing_system.py:_repair_or_fail:198-219; contracts.py:can_retry_codex:270-274; contracts.py:can_repair_spec:277-281"
+        },
+        {
+          "id": "D8",
+          "file": "contracts.py",
+          "symbol": "validate_route_decision",
+          "critical": true,
+          "description": "The route contract gate called by main before recording and applying the route.",
+          "source_evidence": "main.py:_validate_or_stop_decision:85-88; contracts.py:validate_route_decision:252-267"
+        },
+        {
+          "id": "D9",
+          "file": "main.py",
+          "symbol": "_apply_retry_code_route; _apply_repair_spec_route",
+          "critical": true,
+          "description": "Application-time budget checks and counter updates; exhausted application-time budgets set total_cycles to the maximum.",
+          "source_evidence": "main.py:_apply_retry_code_route:91-99; main.py:_apply_repair_spec_route:102-111; contracts.py:can_retry_codex:270-274; contracts.py:can_repair_spec:277-281"
+        }
+      ],
+      "tests_or_absent": "The tracked tree contains no test files or test directory. The Python-source search found no checked-in caller or test consumer for `main`; its direct-execution branch exits with instructions to build an ExecutionInput and call main (`main.py:118-122`). No checked-in tests or executable consumer are available to confirm runtime behavior. This does not rule out consumers outside the supplied worktree.",
+      "answer_evaluations": [
+        {
+          "answer_id": "R1-X",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "Input validation, initial state values, and the absence of a DSL_READY requirement are described accurately.",
+              "verdict": "correct",
+              "evidence": "contracts.py:validate_execution_input:200-228; contracts.py:validate_dsl_candidate:176-195; contracts.py:OrchestratorState:118-128; main.py:main:21-29",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "The adapter writes a temporary spec, builds the command, invokes subprocess.run with workspace cwd, captured text output and timeout, and constructs results for completed processes, timeout, and FileNotFoundError.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:36-75; codex_run.py:run_codex:77-119; codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_codex_command:158-164; codex_run.py:_timeout_seconds:166-170",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "The result includes 'compacted logs.'",
+              "verdict": "false",
+              "evidence": "`_compact_logs` only appends nonempty stdout and stderr strings; it does not truncate or compact them (`codex_run.py:_compact_logs:220-226`).",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "The result is validated, assigned to last_execution, and appended to history before routing.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-42; main.py:_validate_or_stop_result:79-83",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "For failures, routing checks blockers before stuck-loop and error-type branches; the listed error routes and the stuck-loop special handling match source.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:42-118; routing_system.py:_route_stuck_loop:152-171; routing_system.py:_repair_or_regenerate:174-195; routing_system.py:_repair_or_fail:198-219",
+              "dependency_id": "D6"
+            },
+            {
+              "claim": "Retry and repair counter updates, the same-input retry, and the unimplemented repair hook are described accurately.",
+              "verdict": "correct",
+              "evidence": "main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-111; main.py:main:52-59",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "Because history is appended before routing and the detector appends the current error again, two consecutive same-type failures can satisfy its three-entry check on the second failure.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149",
+              "dependency_id": "D6"
+            },
+            {
+              "claim": "Routing branches on status and error_type rather than the inferred tests field.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; codex_run.py:_extract_test_result:229-243",
+              "dependency_id": "D6"
+            },
+            {
+              "claim": "No files were modified and no tests were run by the answer's author.",
+              "verdict": "unsupported",
+              "evidence": "These are claims about the answer author's actions and cannot be established from the repository source.",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D5",
+            "D6",
+            "D7",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D4",
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not name the direct result-validator symbol `contracts.validate_execution_result` or the route-validator symbol `contracts.validate_route_decision`.",
+            "Does not report that the checked-in tree has no tests or executable consumer.",
+            "Does not explicitly state that the adapter's inferred TestResult field is not used by the router; it does state this later in substance.",
+            "Does not describe how uncaught subprocess exceptions other than TimeoutExpired and FileNotFoundError escape without an ExecutionResult."
+          ],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [
+            "The statements that no tests were run and no files were modified are not verifiable from repository evidence."
+          ],
+          "citation_issues": [],
+          "coverage_note": "The conditional control flow and route/counter behavior are largely covered. The false description of logs and missing named validator symbols and repository test/consumer inventory make this partial."
+        },
+        {
+          "answer_id": "R1-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The input gate, initial orchestrator state, and DSL/policy validation conditions are described accurately.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionInput:79-84; contracts.py:validate_execution_input:200-228; contracts.py:OrchestratorState:118-128; main.py:main:21-29",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "The adapter serializes selected input fields, constructs the command, invokes subprocess.run with the workspace and timeout, and handles timeout and FileNotFoundError as described.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:36-46; codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_codex_command:158-164; codex_run.py:_timeout_seconds:166-170; codex_run.py:run_codex:77-119",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "The adapter constructs the result with compacted logs.",
+              "verdict": "false",
+              "evidence": "`_compact_logs` only places nonempty stdout and stderr in a list without compacting their contents (`codex_run.py:_compact_logs:220-226`).",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "The result is contract-checked, saved as last_execution and appended to history before route selection; the selected route is then validated and stored.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-45; main.py:_validate_or_stop_result:79-83; main.py:_validate_or_stop_decision:85-88",
+              "dependency_id": "D5"
+            },
+            {
+              "claim": "The route precedence, error branches, retry/repair eligibility, counter changes, and same-input retry match source.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_route_stuck_loop:152-171; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-111; contracts.py:can_retry_codex:270-274; contracts.py:can_repair_spec:277-281",
+              "dependency_id": "D7"
+            },
+            {
+              "claim": "Two consecutive identical error types can meet the three-entry stuck-loop check because the current result is already in history and is appended again by the detector.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149",
+              "dependency_id": "D6"
+            },
+            {
+              "claim": "A retrieval system mapped the source symbols to the execution path.",
+              "verdict": "unsupported",
+              "evidence": "The repository can establish the source calls, but it provides no evidence for the claimed retrieval-system activity; such discovery output is not ground truth under this validation task.",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not name `contracts.validate_route_decision` as the direct route contract validator.",
+            "Does not report that the checked-in tree has no tests or executable consumer.",
+            "Does not explicitly state that the inferred TestResult field does not affect route selection.",
+            "Does not describe that subprocess exceptions other than the two caught types escape without constructing an ExecutionResult."
+          ],
+          "invented_or_unsupported_edges": [
+            "The `[retrieval-system]` provenance claim is not a repository-supported call or data edge."
+          ],
+          "unsupported_runtime_claims": [
+            "The asserted retrieval-system mapping is not verifiable from repository source."
+          ],
+          "citation_issues": [
+            "The `[retrieval-system]` reference is not a source citation and invokes discovery provenance disallowed by the benchmark instructions."
+          ],
+          "coverage_note": "The described execution and routing logic is mostly accurate, but the logs claim is false and the answer omits the test/consumer inventory and explicit route-validator symbol."
+        },
+        {
+          "answer_id": "R2-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The input checks, including DSL validation and the lack of a DSL_READY requirement, are described accurately.",
+              "verdict": "correct",
+              "evidence": "contracts.py:validate_execution_input:200-228; contracts.py:validate_dsl_candidate:152-197; main.py:main:21-24",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "State initialization, default policy limits, spec serialization, command construction, timeout configuration, and subprocess invocation are described accurately.",
+              "verdict": "correct",
+              "evidence": "contracts.py:RunPolicy:71-75; contracts.py:OrchestratorState:118-128; main.py:main:26-36; codex_run.py:run_codex:36-46; codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_codex_command:158-170",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "The adapter's result includes compacted logs.",
+              "verdict": "false",
+              "evidence": "`_compact_logs` only appends nonempty stdout and stderr; it performs no compaction (`codex_run.py:_compact_logs:220-226`).",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "The completed-process error classification order, timeout/missing-command results, result validation, and append-before-routing order are accurate.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:classify_error:180-211; codex_run.py:run_codex:53-75; codex_run.py:run_codex:77-119; main.py:_validate_or_stop_result:79-83; main.py:main:36-42",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The route conditions, precedence, and retry/repair counter behavior are accurate.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_route_stuck_loop:152-171; routing_system.py:_repair_or_regenerate:174-195; routing_system.py:_repair_or_fail:198-219; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-111",
+              "dependency_id": "D7"
+            },
+            {
+              "claim": "A retry may increment counters to the cycle limit and then exit the loop without another subprocess call.",
+              "verdict": "correct",
+              "evidence": "contracts.py:can_retry_codex:270-274; main.py:main:29-36; main.py:_apply_retry_code_route:91-99",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "The source may differ from an intended three-execution stuck-loop threshold.",
+              "verdict": "unsupported",
+              "evidence": "Source establishes the window and list operations, but does not establish an intended threshold or design intent (`routing_system.py:STUCK_LOOP_WINDOW:16; routing_system.py:_detect_stuck_loop:142-149`).",
+              "dependency_id": null
+            },
+            {
+              "claim": "A retrieval system identified the source symbols and relationships.",
+              "verdict": "unsupported",
+              "evidence": "The repository supports the code relationships but does not establish the claimed retrieval-system activity.",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not name `contracts.validate_route_decision` as the route contract gate.",
+            "Does not report that the checked-in tree has no tests or executable consumer.",
+            "Does not state explicitly that route selection ignores the inferred TestResult field.",
+            "Does not mention that subprocess exceptions other than TimeoutExpired and FileNotFoundError escape without an ExecutionResult."
+          ],
+          "invented_or_unsupported_edges": [
+            "The `[retrieval-system]` provenance is not a source-grounded dependency edge."
+          ],
+          "unsupported_runtime_claims": [
+            "The retrieval-system activity and the suggested intended threshold are not established by repository evidence."
+          ],
+          "citation_issues": [
+            "The `[retrieval-system]` reference is not a repository citation and relies on discovery provenance."
+          ],
+          "coverage_note": "Strong coverage of the conditional path and counter edge cases, but the answer misdescribes the log handling, includes unsupported provenance/intent, and omits the test inventory and explicit route-validator symbol."
+        },
+        {
+          "answer_id": "R2-X",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The answer correctly notes that validation operates on the ExecutionInput dataclass and does not create a separate validated-input type.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionInput:79-84; main.py:main:21-24",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "The adapter's subprocess setup, failure classification, result fields, timeout/missing-command handling, and temporary-spec cleanup are described accurately.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:36-75; codex_run.py:run_codex:77-123; codex_run.py:classify_error:180-211; codex_run.py:_extract_test_result:229-243",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "The result contains compacted logs.",
+              "verdict": "false",
+              "evidence": "`_compact_logs` appends nonempty stdout and stderr as-is without compacting (`codex_run.py:_compact_logs:220-226`).",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "The result is validated and appended before routing, and the route is saved before application.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-45; main.py:_validate_or_stop_result:79-83; main.py:_validate_or_stop_decision:85-88",
+              "dependency_id": "D5"
+            },
+            {
+              "claim": "Under the stated conditional first-failure scenario, test-related output is classified as TEST_FAILURE and the fresh default state can take RETRY_CODEX.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:classify_error:180-185; codex_run.py:_extract_test_result:229-243; routing_system.py:route_decision:54-68; contracts.py:RunPolicy:71-75; contracts.py:can_retry_codex:270-274",
+              "dependency_id": "D7"
+            },
+            {
+              "claim": "If the retry yields another TEST_FAILURE with the stated conditions, the second failure can hit the stuck-loop path and route to repair, updating repair, version, and cycle counters.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:route_decision:51-52; routing_system.py:_route_stuck_loop:152-163; routing_system.py:_repair_or_regenerate:174-195; main.py:_apply_repair_spec_route:102-111",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "The source does not implement the spec replacement hook, and the adapter serializes the input DSL.",
+              "verdict": "correct",
+              "evidence": "main.py:main:56-59; main.py:_apply_repair_spec_route:108-111; codex_run.py:_write_temp_spec:126-149",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "A retrieval system identified the relevant symbols and relationships.",
+              "verdict": "unsupported",
+              "evidence": "No repository source establishes the claimed retrieval-system activity.",
+              "dependency_id": null
+            },
+            {
+              "claim": "No tests were run and no files were modified by the answer's author.",
+              "verdict": "unsupported",
+              "evidence": "These are claims about the answer author's actions and are not verifiable from the checked-out source.",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D9"
+          ],
+          "required_dependency_ids_missed": [
+            "D8"
+          ],
+          "critical_omissions": [
+            "Does not name `contracts.validate_route_decision` as the direct route-validation dependency.",
+            "Does not report the absence of checked-in tests or an executable consumer.",
+            "Does not explicitly note that routing ignores the inferred tests field.",
+            "Does not state that other subprocess exceptions besides the two handled types escape without an ExecutionResult."
+          ],
+          "invented_or_unsupported_edges": [
+            "The `[retrieval-system]` statement is unsupported provenance, not a source-derived call or data edge."
+          ],
+          "unsupported_runtime_claims": [
+            "The retrieval-system activity and the answer author's no-tests/no-modification assertions are not established by repository evidence."
+          ],
+          "citation_issues": [
+            "The `[retrieval-system]` reference is not a source citation and invokes disallowed discovery provenance."
+          ],
+          "coverage_note": "The conditional test-failure example and second-failure counter path follow source. The log description is false, and the answer omits the route validator symbol and repository test/consumer inventory."
+        }
+      ],
+      "runtime_or_dynamic_notes": [
+        "No concrete ExecutionInput, subprocess result, output, or exception is supplied; therefore the actual error type, route, and terminal outcome cannot be selected from source alone.",
+        "For returned subprocesses, the adapter branches on returncode and classifies nonzero output using ordered substring checks. Actual output and returncode are runtime values.",
+        "The adapter catches TimeoutExpired and FileNotFoundError; other exceptions are not converted into ExecutionResult by the shown code.",
+        "The router evaluates the DSL and current history, including the current result already appended by main. Its test signal is not used as a routing condition."
+      ],
+      "validation_limitations": [
+        "Validation was limited to the detached repository at the stated commit and its tracked source; no tests or runtime executions were performed.",
+        "The absence of checked-in callers or tests does not establish that no external consumer exists."
+      ]
+    },
+    "Q3": {
+      "benchmark_id": "Q3",
+      "source_ground_truth": "At HEAD 37bc219ae4f5989d0bfaf6bfb917ae86108d33e1, the tracked tree contains four Python files and three Markdown files; git status is clean. contracts.py:ExecutionErrorType:11-19 declares the current Literal values. ExecutionResult.error_type and RouteDecision.source_error_type use it, and OrchestratorState stores ExecutionResult objects in last_execution and history (contracts.py:95-128). validate_execution_result checks status/error consistency, exit code, and test-result consistency, but has no allowed-value membership check; validate_route_decision likewise does not check source_error_type membership (contracts.py:231-267). codex_run.py:run_codex:22-119 assigns NONE on success, calls classify_error for nonzero subprocess exits, and assigns CODEX_ERROR or ENV_ERROR in timeout and missing-command handlers. classify_error uses ordered text checks and returns only existing categories or UNKNOWN (codex_run.py:180-211). _build_summary interpolates the error value (codex_run.py:214-217). routing_system.py:route_decision:19-118 handles success first, then DSL blockers, stuck loops, named error categories, and finally FATAL for an unmatched category; _detect_stuck_loop and _route_stuck_loop compare repeated categories and send unlisted repeated categories to FATAL (routing_system.py:142-171). main.py:main:21-76 validates, records, routes, and acts on results. contracts.py:to_dict:131-132 uses dataclasses.asdict, with no in-repository call site. codex_run.py:_write_temp_spec:126-155 writes input DSL, validator data, and metadata, not ExecutionResult; there is no result parser or deserializer. No separate execution-error schema, tests, or documentation defining this taxonomy is tracked. Task documents discuss analysis categories and MCP/config failure as benchmark instructions; the SOP discusses generic error handling, not these error values.",
+      "required_dependencies": [
+        {
+          "id": "Q3-D1",
+          "file": "contracts.py",
+          "symbol": "ExecutionErrorType",
+          "critical": true,
+          "description": "The Literal declaration whose allowed values are being expanded.",
+          "source_evidence": "contracts.py:ExecutionErrorType:11-19"
+        },
+        {
+          "id": "Q3-D2",
+          "file": "contracts.py",
+          "symbol": "ExecutionResult.error_type; RouteDecision.source_error_type; OrchestratorState.last_execution/history",
+          "critical": true,
+          "description": "Typed result, decision, and history fields through which the error value is carried.",
+          "source_evidence": "contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115; contracts.py:OrchestratorState:118-128"
+        },
+        {
+          "id": "Q3-D3",
+          "file": "contracts.py",
+          "symbol": "validate_execution_result",
+          "critical": true,
+          "description": "Checks status/error consistency and other result invariants without enumerating allowed error values.",
+          "source_evidence": "contracts.py:validate_execution_result:231-249"
+        },
+        {
+          "id": "Q3-D4",
+          "file": "codex_run.py",
+          "symbol": "run_codex",
+          "critical": true,
+          "description": "Produces ExecutionResult values and selects the classifier or direct exception categories.",
+          "source_evidence": "codex_run.py:run_codex:22-75; codex_run.py:run_codex:77-119"
+        },
+        {
+          "id": "Q3-D5",
+          "file": "codex_run.py",
+          "symbol": "classify_error",
+          "critical": true,
+          "description": "Text classifier for nonzero process exits; it currently has no MCP-specific category.",
+          "source_evidence": "codex_run.py:classify_error:180-211"
+        },
+        {
+          "id": "Q3-D6",
+          "file": "routing_system.py",
+          "symbol": "route_decision",
+          "critical": true,
+          "description": "Maps status, blockers, and known error categories to routes; unmatched failed-result categories reach the FATAL fallback when earlier conditions do not apply.",
+          "source_evidence": "routing_system.py:route_decision:19-118"
+        },
+        {
+          "id": "Q3-D7",
+          "file": "routing_system.py",
+          "symbol": "_detect_stuck_loop; _route_stuck_loop",
+          "critical": true,
+          "description": "Detects repeated error values and routes repeated categories outside the special repair set to FATAL.",
+          "source_evidence": "routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171"
+        },
+        {
+          "id": "Q3-D8",
+          "file": "main.py",
+          "symbol": "main",
+          "critical": true,
+          "description": "Validates and records each result, invokes routing, and carries out the selected route.",
+          "source_evidence": "main.py:main:21-76"
+        },
+        {
+          "id": "Q3-D9",
+          "file": "contracts.py",
+          "symbol": "validate_route_decision",
+          "critical": false,
+          "description": "Validates route-decision confidence, reason, and route/spec-change consistency, but not source_error_type membership.",
+          "source_evidence": "contracts.py:validate_route_decision:252-267"
+        },
+        {
+          "id": "Q3-D10",
+          "file": "contracts.py",
+          "symbol": "to_dict",
+          "critical": false,
+          "description": "Generic dataclass serializer that can carry the string value if called; no repository caller is present.",
+          "source_evidence": "contracts.py:to_dict:131-132"
+        },
+        {
+          "id": "Q3-D11",
+          "file": "codex_run.py",
+          "symbol": "_write_temp_spec",
+          "critical": false,
+          "description": "Relevant serialization check: this writes an input spec, not an ExecutionResult serializer.",
+          "source_evidence": "codex_run.py:_write_temp_spec:126-155"
+        },
+        {
+          "id": "Q3-D12",
+          "file": "codex_run.py",
+          "symbol": "_build_summary",
+          "critical": false,
+          "description": "Interpolates the error category into the failure summary.",
+          "source_evidence": "codex_run.py:_build_summary:214-217"
+        }
+      ],
+      "tests_or_absent": "No test files are tracked, so there are no in-repository tests to update or inspect; no tests were run. No separate execution-error schema, result parser/deserializer, or result JSON reader is present. to_dict has no in-repository call site. The only nearby JSON writer serializes the input spec, not ExecutionResult. The SOP and task documents do not define this error taxonomy.",
+      "answer_evaluations": [
+        {
+          "answer_id": "R1-X",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The Literal declaration, typed result/decision/state fields, classifier return type, and router parameter are the named source surfaces.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionErrorType:11-19; contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115; contracts.py:OrchestratorState:118-128; codex_run.py:classify_error:180; routing_system.py:_detect_stuck_loop:142",
+              "dependency_id": "Q3-D1"
+            },
+            {
+              "claim": "Result validation enforces status/error and other result consistency but does not enforce error-value membership; route-decision validation has no source_error_type membership check.",
+              "verdict": "correct",
+              "evidence": "contracts.py:validate_execution_result:231-249; contracts.py:validate_route_decision:252-267",
+              "dependency_id": "Q3-D3"
+            },
+            {
+              "claim": "The runner classifies nonzero output through existing text branches, while timeout and missing-command catches assign existing categories.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:53-60; codex_run.py:run_codex:77-119; codex_run.py:classify_error:180-211",
+              "dependency_id": "Q3-D5"
+            },
+            {
+              "claim": "Routing checks success and DSL blockers before named categories; an unmatched new category falls through to FATAL, and a repeated unlisted category is also fatal.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+              "dependency_id": "Q3-D6"
+            },
+            {
+              "claim": "The repository inventory contains three Python files and three Markdown files.",
+              "verdict": "false",
+              "evidence": "git ls-files at the specified HEAD lists codex_run.py, contracts.py, main.py, and routing_system.py (four Python files), plus three Markdown files.",
+              "dependency_id": null
+            },
+            {
+              "claim": "The generic serializer, input-spec writer, summary interpolation, documentation scope, and absence of tests/schema/result parser are described accurately.",
+              "verdict": "correct",
+              "evidence": "contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; codex_run.py:_build_summary:214-217; tracked files; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:557-562,1236-1246",
+              "dependency_id": "Q3-D10"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "Q3-D1",
+            "Q3-D2",
+            "Q3-D3",
+            "Q3-D4",
+            "Q3-D5",
+            "Q3-D6",
+            "Q3-D7",
+            "Q3-D8",
+            "Q3-D9",
+            "Q3-D10",
+            "Q3-D11",
+            "Q3-D12"
+          ],
+          "required_dependency_ids_missed": [],
+          "critical_omissions": [],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The docs/task link label contains a retrieval-system placeholder even though its target is the checked-in task document."
+          ],
+          "coverage_note": "Broad coverage of direct and indirect impact, with the repository file-count error. It explicitly identifies absent tests, schema, parser, and taxonomy documentation."
+        },
+        {
+          "answer_id": "R1-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "A retrieval-system importedBy query returned no edges for contracts.py, while the named source imports exist.",
+              "verdict": "unsupported",
+              "evidence": "The imports are source-confirmed at codex_run.py:10-16, routing_system.py:3-13, and main.py:6-18; the reported graph-query result cannot be established from repository source and is disallowed as ground truth.",
+              "dependency_id": null
+            },
+            {
+              "claim": "ExecutionErrorType is a Literal used by ExecutionResult.error_type and RouteDecision.source_error_type.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionErrorType:11-19; contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115",
+              "dependency_id": "Q3-D2"
+            },
+            {
+              "claim": "The runner's nonzero-exit classifier and exception handlers emit only existing categories, while result validation has no allowed-value membership branch.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:53-60,77-119; codex_run.py:classify_error:180-211; contracts.py:validate_execution_result:231-249",
+              "dependency_id": "Q3-D4"
+            },
+            {
+              "claim": "With no earlier blocking or stuck-loop condition, an unhandled error category falls back to FATAL; repeated categories outside the repair set also route to FATAL.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:42-118; routing_system.py:_route_stuck_loop:152-171",
+              "dependency_id": "Q3-D6"
+            },
+            {
+              "claim": "The orchestrator records results before routing; to_dict is generic with no repository caller, and the JSON writer does not serialize ExecutionResult.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-45; contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; repository search finds only the to_dict definition.",
+              "dependency_id": "Q3-D8"
+            },
+            {
+              "claim": "The tracked tree has no tests or separate schema/result parser, and the cited docs do not define the error taxonomy.",
+              "verdict": "correct",
+              "evidence": "git ls-files at HEAD; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:24-28,557-562",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "Q3-D1",
+            "Q3-D2",
+            "Q3-D3",
+            "Q3-D4",
+            "Q3-D5",
+            "Q3-D6",
+            "Q3-D7",
+            "Q3-D8",
+            "Q3-D10",
+            "Q3-D11",
+            "Q3-D12"
+          ],
+          "required_dependency_ids_missed": [
+            "Q3-D9"
+          ],
+          "critical_omissions": [],
+          "invented_or_unsupported_edges": [
+            "The reported importedBy query result relies on external graph output; the actual imports are independently confirmed by source."
+          ],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The ExecutionResult.error_type and RouteDecision.source_error_type citations point to contracts.py:96 and :108, which are class declaration lines; the field declarations are at :99 and :114."
+          ],
+          "coverage_note": "The source-based impact map is broad. It omits validate_route_decision's lack of source_error_type membership checking and includes graph-query provenance that cannot serve as evidence under the instructions."
+        },
+        {
+          "answer_id": "R2-X",
+          "verdict": "complete",
+          "claims": [
+            {
+              "claim": "The declaration, typed fields, result validation, and route-decision validation behave as described; neither validator checks error-type membership.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionErrorType:11-19; contracts.py:ExecutionResult:95-104; contracts.py:RouteDecision:107-115; contracts.py:validate_execution_result:231-249; contracts.py:validate_route_decision:252-267",
+              "dependency_id": "Q3-D3"
+            },
+            {
+              "claim": "run_codex uses classify_error for nonzero process exits and assigns existing values for timeout and missing-command exceptions; the classifier has no MCP-specific branch.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:53-60,77-119; codex_run.py:classify_error:180-211",
+              "dependency_id": "Q3-D5"
+            },
+            {
+              "claim": "Named router branches, blocking-state precedence, default FATAL handling, and repeated-error handling for a new category are described accurately.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_detect_stuck_loop:142-149; routing_system.py:_route_stuck_loop:152-171",
+              "dependency_id": "Q3-D6"
+            },
+            {
+              "claim": "The orchestrator validates and records results before routing, and updates counters or stops according to route outcomes.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-73; main.py:_apply_retry_code_route:91-100; main.py:_apply_repair_spec_route:102-112",
+              "dependency_id": "Q3-D8"
+            },
+            {
+              "claim": "to_dict is generic and has no in-repository caller; the input JSON writer is not an ExecutionResult serializer; there is no result parser or separate schema/test file; documentation does not define this taxonomy.",
+              "verdict": "correct",
+              "evidence": "contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; git ls-files at HEAD; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:557-562,1236-1246",
+              "dependency_id": "Q3-D10"
+            },
+            {
+              "claim": "Whether external CLI diagnostics contain an MCP startup failure and how those diagnostics classify is not established by this source.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:_build_codex_command:158-164; codex_run.py:run_codex:40-54; codex_run.py:classify_error:180-211",
+              "dependency_id": "Q3-D5"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "Q3-D1",
+            "Q3-D2",
+            "Q3-D3",
+            "Q3-D4",
+            "Q3-D5",
+            "Q3-D6",
+            "Q3-D7",
+            "Q3-D8",
+            "Q3-D9",
+            "Q3-D10",
+            "Q3-D11"
+          ],
+          "required_dependency_ids_missed": [
+            "Q3-D12"
+          ],
+          "critical_omissions": [],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The Markdown citations for validate_execution_result and validate_route_decision contain a space after the link parenthesis, making those citation links malformed."
+          ],
+          "coverage_note": "Covers all critical source dependencies and the required absence/runtime boundaries. It does not mention _build_summary, a noncritical direct consumer."
+        },
+        {
+          "answer_id": "R2-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The change as posed only widens the Literal annotation and, by itself, does not add an emitting classifier branch or new routing branch.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionErrorType:11-19; codex_run.py:classify_error:180-211; routing_system.py:route_decision:54-118",
+              "dependency_id": "Q3-D1"
+            },
+            {
+              "claim": "Result validation checks status/error consistency and other invariants without membership checking; a failed new category passes those error-type conditions while a successful one fails them.",
+              "verdict": "correct",
+              "evidence": "contracts.py:validate_execution_result:231-249",
+              "dependency_id": "Q3-D3"
+            },
+            {
+              "claim": "The runner and classifier behavior, including timeout/missing-command handling, is accurately described.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:53-60,77-119; codex_run.py:classify_error:180-211",
+              "dependency_id": "Q3-D5"
+            },
+            {
+              "claim": "The router's blocker precedence, unmatched-category fallback, and repeated-category fatal path are accurately described with the stated conditions.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:33-118; routing_system.py:_route_stuck_loop:152-171",
+              "dependency_id": "Q3-D6"
+            },
+            {
+              "claim": "The main loop validates, records, routes, and stops on FATAL; the generic serializer, input JSON writer, and test-output extractor do not provide a result parser.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-73; contracts.py:to_dict:131-132; codex_run.py:_write_temp_spec:126-155; codex_run.py:_extract_test_result:229-243",
+              "dependency_id": "Q3-D8"
+            },
+            {
+              "claim": "The reported retrieval-system related-test query returned zero.",
+              "verdict": "unsupported",
+              "evidence": "This query output is not repository evidence and cannot be used as ground truth; independently, git ls-files at HEAD shows no tracked test files.",
+              "dependency_id": null
+            },
+            {
+              "claim": "The tracked inventory lacks separate schema and test files, and the cited docs do not define the error taxonomy.",
+              "verdict": "correct",
+              "evidence": "git ls-files at HEAD; docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:203-211,437; 开发SOP流程与提示词.md:24-28,557-562",
+              "dependency_id": null
+            },
+            {
+              "claim": "The source does not establish whether an external command starts an MCP server or what diagnostics it emits; text classification therefore remains runtime-dependent.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:_build_codex_command:158-164; codex_run.py:run_codex:40-54; codex_run.py:classify_error:180-211",
+              "dependency_id": "Q3-D5"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "Q3-D1",
+            "Q3-D2",
+            "Q3-D3",
+            "Q3-D4",
+            "Q3-D5",
+            "Q3-D6",
+            "Q3-D7",
+            "Q3-D8",
+            "Q3-D10",
+            "Q3-D11",
+            "Q3-D12"
+          ],
+          "required_dependency_ids_missed": [
+            "Q3-D9"
+          ],
+          "critical_omissions": [],
+          "invented_or_unsupported_edges": [
+            "The related-test query result is external graph output and is unsupported; the source-tree inventory independently confirms no tracked tests."
+          ],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The retrieval-system test-query assertion has no admissible repository citation."
+          ],
+          "coverage_note": "The source-grounded impact map is strong but omits validate_route_decision's lack of source_error_type membership checking and reports a prohibited graph-query result."
+        }
+      ],
+      "runtime_or_dynamic_notes": [
+        "The checked-in classifier consumes external subprocess stdout/stderr using ordered substring checks. An MCP startup diagnostic could match one of the existing generic branches or fall through to UNKNOWN; the repository does not establish the diagnostic wording or MCP startup behavior.",
+        "Adding the Literal value alone supplies no producer branch. An external caller could construct an ExecutionResult containing that string, but out-of-checkout callers and consumers are unknown."
+      ],
+      "validation_limitations": [
+        "The specified HEAD was verified and the working tree was clean. Only this detached repository worktree was inspected.",
+        "No tests or runtime commands were run, as instructed. No external graph output or source was used to establish ground truth."
+      ]
+    },
+    "Q4": {
+      "benchmark_id": "Q4",
+      "source_ground_truth": "At HEAD 37bc219ae4f5989d0bfaf6bfb917ae86108d33e1, ExecutionInput.metadata is a general dict and timeout_seconds is not a RunPolicy field (contracts.py:ExecutionInput:79-84; RunPolicy:71-75). validate_execution_input checks readiness, DSL, workspace, and policy limits, but does not validate timeout metadata (contracts.py:validate_execution_input:200-228). _timeout_seconds selects metadata['timeout_seconds'] only when isinstance(value, int) and value > 0; otherwise it returns DEFAULT_TIMEOUT_SECONDS=300 (codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; _timeout_seconds:166-170). _write_temp_spec also serializes the metadata, but run_codex supplies the selected timeout directly to subprocess.run (codex_run.py:_write_temp_spec:126-155; run_codex:36-46).\n\nIf subprocess.run returns, run_codex derives status from returncode and calls classify_error only for nonzero returns (codex_run.py:run_codex:48-75). The classifier checks test, spec, validation, and environment text before timeout/runtime/exception terms (codex_run.py:classify_error:180-212). If TimeoutExpired is raised, the separate handler constructs FAILED with exit_code=-1 and error_type=CODEX_ERROR, adds available exception output to logs/raw (or a fallback stderr message), sets tests.ran=False, and records timeout_seconds by calling the helper again; it does not call classify_error (codex_run.py:run_codex:77-101). The finally block attempts temporary-spec cleanup and ignores OSError (codex_run.py:run_codex:121-123; _cleanup_temp_spec:173-177).\n\nmain validates the result, sets last_execution, appends it to history, and then calls route_decision (main.py:main:36-43). Routing prioritizes success, blocking DSL state, stuck-loop detection, and then error-type dispatch; a non-blocked, non-stuck CODEX_ERROR routes to RETRY_CODEX if can_retry_codex permits, otherwise FATAL (routing_system.py:route_decision:33-52,86-101; contracts.py:can_retry_codex:270-274). The detector takes the last STUCK_LOOP_WINDOW-1 history errors and appends the current error (routing_system.py:STUCK_LOOP_WINDOW:16; _detect_stuck_loop:142-149). Since main has already appended the current result, two consecutive matching failures in main can satisfy the three-item comparison. Repeated CODEX_ERROR routes to FATAL; only repeated test, spec-conflict, and validation errors enter the stuck-loop repair branch (routing_system.py:_route_stuck_loop:152-171). Blocking DSL state takes precedence and routes to REPAIR_SPEC (routing_system.py:route_decision:42-49).\n\nmain passes the same ExecutionInput to each run_codex invocation. Applying an accepted retry increments codex_retries and total_cycles, then continues; the retry handler does not change the input or its metadata (main.py:main:36,52-54; _apply_retry_code_route:91-100). The loop condition is total_cycles < max_total_cycles; an accepted retry or repair that reaches the limit leads to the max-cycle message after the loop, while SUCCESS and FATAL return earlier (main.py:main:29,48-76; _apply_repair_spec_route:102-112). The default policy is 10 total cycles and 2 Codex retries (contracts.py:RunPolicy:71-75).\n\nThe separate checked-in task document specifies a measured-session hard-timeout policy and transient-only retry policy (docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:TIMEOUT / RECOVERY POLICY:605-643); this is documentation, not the executable timeout/retry behavior above.",
+      "required_dependencies": [
+        {
+          "id": "D1",
+          "file": "contracts.py",
+          "symbol": "ExecutionInput",
+          "critical": true,
+          "description": "Origin of timeout configuration: metadata is an arbitrary dict, separate from RunPolicy.",
+          "source_evidence": "contracts.py:ExecutionInput:79-84; contracts.py:RunPolicy:71-75"
+        },
+        {
+          "id": "D2",
+          "file": "codex_run.py",
+          "symbol": "_timeout_seconds",
+          "critical": true,
+          "description": "Reads timeout_seconds from ExecutionInput.metadata, applies the positive-int condition, and falls back to the 300-second default.",
+          "source_evidence": "codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; codex_run.py:_timeout_seconds:166-170"
+        },
+        {
+          "id": "D3",
+          "file": "codex_run.py",
+          "symbol": "_write_temp_spec",
+          "critical": false,
+          "description": "Serializes the same metadata into the temporary spec file; this is a side path, not the source of subprocess.run's timeout argument.",
+          "source_evidence": "codex_run.py:_write_temp_spec:126-155"
+        },
+        {
+          "id": "D4",
+          "file": "codex_run.py",
+          "symbol": "run_codex",
+          "critical": true,
+          "description": "Passes the selected timeout to subprocess.run and handles TimeoutExpired by directly constructing a failed CODEX_ERROR result.",
+          "source_evidence": "codex_run.py:run_codex:22-101"
+        },
+        {
+          "id": "D5",
+          "file": "codex_run.py",
+          "symbol": "classify_error",
+          "critical": true,
+          "description": "Classifies only normal nonzero subprocess returns; its ordered text checks are distinct from the TimeoutExpired handler.",
+          "source_evidence": "codex_run.py:classify_error:180-212; run_codex:48-55,77-101"
+        },
+        {
+          "id": "D6",
+          "file": "contracts.py",
+          "symbol": "validate_execution_input / validate_execution_result",
+          "critical": false,
+          "description": "Shows which input fields are validated and that a failed result with exit_code=-1 is allowed by the result contract.",
+          "source_evidence": "contracts.py:validate_execution_input:200-228; validate_execution_result:231-249"
+        },
+        {
+          "id": "D7",
+          "file": "main.py",
+          "symbol": "main",
+          "critical": true,
+          "description": "Connects run_codex, result validation, history append, routing, retry/repair continuations, and loop exit.",
+          "source_evidence": "main.py:main:21-76"
+        },
+        {
+          "id": "D8",
+          "file": "routing_system.py",
+          "symbol": "route_decision",
+          "critical": true,
+          "description": "Defines routing precedence and the CODEX_ERROR retry-or-fatal branch.",
+          "source_evidence": "routing_system.py:route_decision:19-118"
+        },
+        {
+          "id": "D9",
+          "file": "routing_system.py",
+          "symbol": "_detect_stuck_loop / _route_stuck_loop",
+          "critical": true,
+          "description": "Defines the history window behavior and what repeated CODEX_ERROR does.",
+          "source_evidence": "routing_system.py:STUCK_LOOP_WINDOW:16; _detect_stuck_loop:142-149; _route_stuck_loop:152-171"
+        },
+        {
+          "id": "D10",
+          "file": "contracts.py",
+          "symbol": "RunPolicy / can_retry_codex / can_repair_spec",
+          "critical": true,
+          "description": "Provides retry, repair, and total-cycle limits used by the router and main loop.",
+          "source_evidence": "contracts.py:RunPolicy:71-75; can_retry_codex:270-274; can_repair_spec:277-281"
+        },
+        {
+          "id": "D11",
+          "file": "main.py",
+          "symbol": "_apply_retry_code_route",
+          "critical": true,
+          "description": "Increments retry/cycle counters and participates in the max-cycle stop path.",
+          "source_evidence": "main.py:_apply_retry_code_route:91-100; main:29,52-54,75-76"
+        },
+        {
+          "id": "D12",
+          "file": "main.py",
+          "symbol": "_apply_repair_spec_route",
+          "critical": false,
+          "description": "Shows repair-route counter changes and that the repair hook is not implemented in this checked-in path.",
+          "source_evidence": "main.py:main:56-59; _apply_repair_spec_route:102-112"
+        },
+        {
+          "id": "D13",
+          "file": "DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md",
+          "symbol": "TIMEOUT / RECOVERY POLICY",
+          "critical": false,
+          "description": "Separately documents measured-session timeout and retry requirements; it does not implement run_codex behavior.",
+          "source_evidence": "docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:605-643"
+        }
+      ],
+      "tests_or_absent": "The tracked tree contains no test files or test directory. Search of the checked-out source finds main.main as the sole checked-in caller of run_codex and route_decision; no other code consumer or test consumer is present. No tests were run, as instructed.",
+      "answer_evaluations": [
+        {
+          "answer_id": "R1-X",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "The retrieval-system led from main to run_codex and routing, and was a discovery aid verified against source.",
+              "verdict": "unsupported",
+              "evidence": "Repository source confirms main.py:main:36,42 calls run_codex and route_decision, but cannot establish the claimed retrieval-system provenance. The validator was instructed not to use CodeGraph or external graph results.",
+              "dependency_id": null
+            },
+            {
+              "claim": "ExecutionInput.metadata is a general dict, timeout_seconds is selected by _timeout_seconds with a 300-second fallback, and metadata is also serialized into the temporary spec.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionInput:79-84; codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; _timeout_seconds:166-170; _write_temp_spec:126-155.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "run_codex passes the selected value to subprocess.run; started_at precedes spec creation, so recorded duration includes work outside the subprocess call.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:32-48; timeout is passed at lines 40-46.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "TimeoutExpired directly becomes FAILED/CODEX_ERROR with exit_code=-1, timeout summary, output in logs/raw when present, tests.ran=False, and timeout_seconds in raw; the handler bypasses classify_error.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:77-101; _compact_logs:220-226.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "Normal nonzero returns use classify_error, which checks test/spec/validation/environment terms before timeout/runtime terms.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-55; classify_error:180-212.",
+              "dependency_id": "D5"
+            },
+            {
+              "claim": "main appends each result before routing; routing checks success, blocking DSL, then stuck-loop detection before error dispatch.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-43; routing_system.py:route_decision:33-52.",
+              "dependency_id": "D7"
+            },
+            {
+              "claim": "A non-blocked, non-stuck CODEX_ERROR can retry while budgets allow and otherwise is fatal; two consecutive matching CODEX_ERROR results in main can satisfy the detector and route fatal.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:86-101; _detect_stuck_loop:142-149; _route_stuck_loop:152-171; main.py:main:39-42. Blocking DSL state preempts stuck-loop detection.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "Accepted retry or repair routes increment total_cycles; when the loop reaches max_total_cycles it prints the max-cycle stop message and returns.",
+              "verdict": "correct",
+              "evidence": "main.py:main:29,52-59,75-76; _apply_retry_code_route:91-100; _apply_repair_spec_route:102-112.",
+              "dependency_id": "D11"
+            },
+            {
+              "claim": "The checked-in code does not establish timeout timing or whether a child or descendants have terminated when the handler runs.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:40-46,77-101 contains the timeout argument and exception handling but no explicit process-termination or process-group operation.",
+              "dependency_id": "D4"
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11"
+          ],
+          "required_dependency_ids_missed": [
+            "D6",
+            "D12",
+            "D13"
+          ],
+          "critical_omissions": [
+            "Does not explicitly connect RETRY_CODEX back to another run_codex call with the same ExecutionInput and unchanged timeout metadata, so the configured timeout's persistence across retries is left implicit."
+          ],
+          "invented_or_unsupported_edges": [
+            "The retrieval-system provenance claim is not repository evidence; the direct main.py calls themselves are source-confirmed."
+          ],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The ExecutionInput link points to contracts.py:79, the class declaration; metadata is at contracts.py:84.",
+            "The subprocess-call link at codex_run.py:40 begins the call but does not point directly to the timeout argument at line 45.",
+            "The duration citation at codex_run.py:78 is the TimeoutExpired branch; normal-return duration is calculated at line 48."
+          ],
+          "coverage_note": "The source flow is otherwise traced accurately, including the stuck-loop history duplication and the documented-versus-runtime boundary. The answer includes unsupported discovery provenance and leaves retry reuse of the configured timeout unstated."
+        },
+        {
+          "answer_id": "R1-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "ExecutionInput.metadata is a general dict; _timeout_seconds uses a positive int value or the 300-second default, and metadata is serialized into the spec.",
+              "verdict": "correct",
+              "evidence": "contracts.py:ExecutionInput:79-84; codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; _timeout_seconds:166-170; _write_temp_spec:126-155.",
+              "dependency_id": "D1"
+            },
+            {
+              "claim": "TimeoutExpired constructs FAILED/CODEX_ERROR with exit_code=-1, a fixed summary, available output in logs/raw, tests.ran=False, and the selected timeout in raw; it bypasses classify_error.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:77-101.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "Normal nonzero exits are classified from stderr and stdout, with test/spec/validation/environment checks before timeout/runtime checks.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-55; classify_error:180-212.",
+              "dependency_id": "D5"
+            },
+            {
+              "claim": "main stores results before routing; blocking DSL state and stuck-loop detection precede ordinary error dispatch; repeated CODEX_ERROR can become fatal through the stuck-loop path.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-43; routing_system.py:route_decision:33-52,86-101; _detect_stuck_loop:142-149; _route_stuck_loop:152-171.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "The max-cycle loop increments counters on accepted retry or repair routes, and reaching the limit after continue exits through the max-cycle message.",
+              "verdict": "correct",
+              "evidence": "main.py:main:29,52-59,75-76; _apply_retry_code_route:91-100; _apply_repair_spec_route:102-112; contracts.py:RunPolicy:71-75.",
+              "dependency_id": "D11"
+            },
+            {
+              "claim": "The task document specifies a separate measured-session timeout/retry policy, while the executable path directly labels caught timeouts CODEX_ERROR and may retry under the general route policy.",
+              "verdict": "correct",
+              "evidence": "docs/tasks/DEVSOPBYAI-CODEXB-CODEGRAPH-CONTROLLED-REPO-NAV-AB-2026-10-02.md:605-643; codex_run.py:run_codex:77-101; routing_system.py:route_decision:86-101.",
+              "dependency_id": "D13"
+            },
+            {
+              "claim": "Python/OS runtime behavior determines timeout timing and child/descendant termination details not established by this repository code.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:40-46,77-101 does not implement explicit process termination. No runtime-specific termination behavior is established by the cited source.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "No files were modified and no tests were run.",
+              "verdict": "unsupported",
+              "evidence": "The checked-out tree is clean and contains no tests, but repository evidence cannot verify the answer author's historical test activity.",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D13"
+          ],
+          "required_dependency_ids_missed": [
+            "D6",
+            "D12"
+          ],
+          "critical_omissions": [
+            "Does not explicitly state that a retry invokes run_codex again with the same ExecutionInput and unchanged metadata, so persistence of the configured timeout across retries is implicit."
+          ],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The cited timeout-handler, routing, and task-document lines are relevant. The broad subprocess-call citation at codex_run.py:40 could be made more exact by citing lines 40-46."
+          ],
+          "coverage_note": "Strong source coverage, including the separate task-document policy. The retry path does not explicitly close the loop back to the same configured timeout."
+        },
+        {
+          "answer_id": "R2-X",
+          "verdict": "complete",
+          "claims": [
+            {
+              "claim": "ExecutionInput.metadata is general-purpose and separate from RunPolicy; input validation checks policy limits but not timeout metadata.",
+              "verdict": "correct",
+              "evidence": "contracts.py:RunPolicy:71-75; ExecutionInput:79-84; validate_execution_input:200-228.",
+              "dependency_id": "D6"
+            },
+            {
+              "claim": "_timeout_seconds uses a positive int from metadata or defaults to 300, and run_codex passes it to subprocess.run; metadata is also written to the spec JSON.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; _timeout_seconds:166-170; run_codex:40-46; _write_temp_spec:126-155.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "Normal nonzero returns are classified from stderr/stdout, with timeout text checked after test/spec/validation/environment terms.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-55; classify_error:180-212.",
+              "dependency_id": "D5"
+            },
+            {
+              "claim": "TimeoutExpired directly constructs FAILED/CODEX_ERROR, exit_code=-1, timeout summary, tests.ran=False, output fields, and raw timeout data; the handler does not call classify_error.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:77-101.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The finally path attempts temporary-spec cleanup and ignores OSError.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:121-123; _cleanup_temp_spec:173-177.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "main validates and stores a result, appends it to history, then routes; blocking DSL state precedes stuck-loop detection and error dispatch.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-43; routing_system.py:route_decision:33-52.",
+              "dependency_id": "D7"
+            },
+            {
+              "claim": "Because the current result is already in history, two consecutive matching errors in main can fill the three-item detector; repeated CODEX_ERROR becomes fatal, subject to blocking DSL taking precedence.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:_detect_stuck_loop:142-149; _route_stuck_loop:152-171; route_decision:42-52.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "When the stuck-loop check does not fire, CODEX_ERROR retries if cycle and retry budgets permit; a retry reuses the same ExecutionInput, and the retry handler changes counters rather than timeout metadata.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:86-101; contracts.py:can_retry_codex:270-274; main.py:main:36,52-54; _apply_retry_code_route:91-100.",
+              "dependency_id": "D11"
+            },
+            {
+              "claim": "total_cycles starts at zero, increments on retry/repair transitions, and a fatal route returns before the max-cycle message.",
+              "verdict": "correct",
+              "evidence": "contracts.py:OrchestratorState:119-128; main.py:main:26-29,52-76; _apply_retry_code_route:91-100; _apply_repair_spec_route:102-112.",
+              "dependency_id": "D11"
+            },
+            {
+              "claim": "The source does not establish exact timeout timing or what happens to the process or children on timeout.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:40-46,77-101 establishes the argument and exception handler, not runtime termination details.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "No tests were run and no files were changed.",
+              "verdict": "unsupported",
+              "evidence": "The repository tree is clean and has no tests, but source evidence cannot verify the answer author's historical test activity.",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11"
+          ],
+          "required_dependency_ids_missed": [
+            "D12",
+            "D13"
+          ],
+          "critical_omissions": [],
+          "invented_or_unsupported_edges": [],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The combined citation contracts.py:71 supports RunPolicy, not ExecutionInput.metadata; the metadata field is at contracts.py:84.",
+            "The run_codex citation at codex_run.py:36 points to the try-block start; the subprocess call and timeout argument are at lines 40-46."
+          ],
+          "coverage_note": "Complete trace of timeout selection, exception versus normal classification, routing, stuck-loop behavior, retry input reuse, and max-cycle/fatal exits. Repair-hook details and the separate task-document policy are noncritical omissions for this trace."
+        },
+        {
+          "answer_id": "R2-Y",
+          "verdict": "partial",
+          "claims": [
+            {
+              "claim": "ExecutionInput.metadata is a general dict separate from RunPolicy; validation does not validate timeout metadata; _timeout_seconds selects a positive int or defaults to 300.",
+              "verdict": "correct",
+              "evidence": "contracts.py:RunPolicy:71-75; ExecutionInput:79-84; validate_execution_input:200-228; codex_run.py:DEFAULT_TIMEOUT_SECONDS:19; _timeout_seconds:166-170.",
+              "dependency_id": "D2"
+            },
+            {
+              "claim": "The selected value is passed directly to subprocess.run, while metadata is separately serialized into the temporary spec JSON.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:40-46; _write_temp_spec:126-155.",
+              "dependency_id": "D3"
+            },
+            {
+              "claim": "TimeoutExpired constructs FAILED/CODEX_ERROR with exit_code=-1, timeout summary, available output, tests.ran=False, and raw timeout data; the helper is called again for raw data.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:77-101, especially lines 93-99.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The failed-result contract accepts exit_code=-1, and the finally block attempts temp-spec cleanup.",
+              "verdict": "correct",
+              "evidence": "contracts.py:validate_execution_result:231-249; codex_run.py:run_codex:121-123; _cleanup_temp_spec:173-177.",
+              "dependency_id": "D6"
+            },
+            {
+              "claim": "The timeout branch assigns CODEX_ERROR directly; normal returned nonzero exits instead use the ordered text classifier.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:48-55,77-101; classify_error:180-212.",
+              "dependency_id": "D5"
+            },
+            {
+              "claim": "main appends results before routing; blocking DSL state precedes stuck-loop detection and normal CODEX_ERROR retry logic.",
+              "verdict": "correct",
+              "evidence": "main.py:main:36-43; routing_system.py:route_decision:33-52,86-101.",
+              "dependency_id": "D7"
+            },
+            {
+              "claim": "History append plus detector slice-and-append means two consecutive same-type results can satisfy the nominal three-error comparison; repeated CODEX_ERROR goes fatal through the stuck-loop route.",
+              "verdict": "correct",
+              "evidence": "main.py:main:39-42; routing_system.py:STUCK_LOOP_WINDOW:16; _detect_stuck_loop:142-149; _route_stuck_loop:152-171.",
+              "dependency_id": "D9"
+            },
+            {
+              "claim": "Otherwise CODEX_ERROR retries when budgets permit; policy defaults are 10 cycles and 2 retries, and retry transitions increment counters.",
+              "verdict": "correct",
+              "evidence": "routing_system.py:route_decision:86-101; contracts.py:RunPolicy:71-75; can_retry_codex:270-274; main.py:_apply_retry_code_route:91-100.",
+              "dependency_id": "D10"
+            },
+            {
+              "claim": "The loop exits with the max-cycle message after a retry increments total_cycles to the limit; FATAL returns earlier.",
+              "verdict": "correct",
+              "evidence": "main.py:main:29,52-54,69-76; _apply_retry_code_route:91-100.",
+              "dependency_id": "D11"
+            },
+            {
+              "claim": "The checked-in source does not establish timeout precision or process/descendant termination behavior.",
+              "verdict": "correct",
+              "evidence": "codex_run.py:run_codex:40-46,77-101 contains no explicit process-termination operation.",
+              "dependency_id": "D4"
+            },
+            {
+              "claim": "The retrieval-system identified the call chain and the answer was verified at the specified commit.",
+              "verdict": "unsupported",
+              "evidence": "The source confirms main.py calls run_codex and route_decision, but cannot establish retrieval-system provenance. The validator was instructed not to use CodeGraph or external graph results.",
+              "dependency_id": null
+            },
+            {
+              "claim": "No files were modified and no tests were run.",
+              "verdict": "unsupported",
+              "evidence": "The checked-out tree is clean and contains no tests, but repository evidence cannot verify the answer author's historical test activity.",
+              "dependency_id": null
+            }
+          ],
+          "required_dependency_ids_found": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11"
+          ],
+          "required_dependency_ids_missed": [
+            "D12",
+            "D13"
+          ],
+          "critical_omissions": [
+            "Does not explicitly state that retry re-invokes run_codex with the same ExecutionInput and unchanged timeout metadata, so it does not close the configured-timeout flow across retries."
+          ],
+          "invented_or_unsupported_edges": [
+            "The retrieval-system provenance claim is unsupported; the direct source calls are present in main.py."
+          ],
+          "unsupported_runtime_claims": [],
+          "citation_issues": [
+            "The source line references for the timeout, routing, and max-cycle claims are substantially accurate; the retrieval-system provenance has no source citation."
+          ],
+          "coverage_note": "Most source behavior is accurately described, but the answer includes unsupported discovery provenance and leaves timeout reuse across retries implicit."
+        }
+      ],
+      "runtime_or_dynamic_notes": [
+        "The checked-in code establishes only that a timeout value is passed to subprocess.run and that the TimeoutExpired branch runs if that exception is raised. No timeout precision, child termination, descendant termination, or process-group behavior was verified.",
+        "No Python standard-library documentation was inspected. Runtime-specific subprocess behavior is therefore left unasserted; the repository source itself contains no explicit process termination call."
+      ],
+      "validation_limitations": [
+        "No tests were run, as instructed; the tracked tree contains no test files.",
+        "Claims about prior answer authors' test activity or discovery provenance cannot be verified from this repository.",
+        "The task document's measured-session TIMEOUT and transient-only retry rules are documented requirements, not evidence that the executable flow implements them."
+      ]
+    }
+  },
+  "answer_results": [
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R1",
+      "arm": "A",
+      "anonymous_label": "Y",
+      "run_id": "Q1-R1-A",
+      "correct_factual_claims": 9,
+      "false_factual_claims": 1,
+      "unsupported_claims": 0,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 6,
+      "required_dependencies_missed": 3,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D6",
+        "D7",
+        "D8"
+      ],
+      "dependency_recall": 0.6666666666666666,
+      "claim_precision": 0.9,
+      "critical_dependency_misses": [
+        "D6",
+        "D7",
+        "D8"
+      ],
+      "critical_omission_count": 3,
+      "validator_critical_omission_notes": [
+        "Does not identify main's direct calls to contracts.can_retry_codex and contracts.can_repair_spec (D6).",
+        "Does not identify the router's direct budget-helper dependencies (D7).",
+        "Does not identify the router's direct contracts.py blocking-predicate dependencies (D8)."
+      ],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 0,
+      "citation_issues": [],
+      "verdict": "partial",
+      "coverage_note": "The narrative covers the major behavior and source branches, but omits several direct contracts.py helper dependencies and overstates the test-result validator's runtime check."
+    },
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R1",
+      "arm": "B",
+      "anonymous_label": "X",
+      "run_id": "Q1-R1-B",
+      "correct_factual_claims": 8,
+      "false_factual_claims": 1,
+      "unsupported_claims": 0,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 8,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D8"
+      ],
+      "dependency_recall": 0.8888888888888888,
+      "claim_precision": 0.8888888888888888,
+      "critical_dependency_misses": [
+        "D8"
+      ],
+      "critical_omission_count": 1,
+      "validator_critical_omission_notes": [
+        "Does not identify the router's direct contracts.py predicate dependencies contains_blocking_marker and is_none_section (D8)."
+      ],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 0,
+      "citation_issues": [],
+      "verdict": "partial",
+      "coverage_note": "The execution path and major route branches are well covered. The result-validation claim overstates what the code enforces, and the router-to-contract blocking-predicate edge is not identified."
+    },
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R2",
+      "arm": "A",
+      "anonymous_label": "X",
+      "run_id": "Q1-R2-A",
+      "correct_factual_claims": 9,
+      "false_factual_claims": 0,
+      "unsupported_claims": 0,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 8,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D8"
+      ],
+      "dependency_recall": 0.8888888888888888,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [
+        "D8"
+      ],
+      "critical_omission_count": 1,
+      "validator_critical_omission_notes": [
+        "Does not identify the router's direct contracts.py predicate dependencies contains_blocking_marker and is_none_section (D8)."
+      ],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 0,
+      "citation_issues": [],
+      "verdict": "partial",
+      "coverage_note": "This is a strong source trace with supported inferences about loop detection, success precedence, and repair behavior. It omits the router-to-contract blocking-predicate dependency."
+    },
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R2",
+      "arm": "B",
+      "anonymous_label": "Y",
+      "run_id": "Q1-R2-B",
+      "correct_factual_claims": 9,
+      "false_factual_claims": 1,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 6,
+      "required_dependencies_missed": 3,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D6",
+        "D7",
+        "D8"
+      ],
+      "dependency_recall": 0.6666666666666666,
+      "claim_precision": 0.9,
+      "critical_dependency_misses": [
+        "D6",
+        "D7",
+        "D8"
+      ],
+      "critical_omission_count": 3,
+      "validator_critical_omission_notes": [
+        "Does not identify main's direct calls to contracts.can_retry_codex and contracts.can_repair_spec (D6).",
+        "Does not identify routing_system's direct budget-helper dependencies (D7).",
+        "Does not identify routing_system's direct contracts.py blocking-predicate dependencies (D8)."
+      ],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The [retrieval-system] reference is not repository/Git evidence and its discovery claim is disallowed for this validation; the actual source call path was verified independently."
+      ],
+      "verdict": "partial",
+      "coverage_note": "The source trace covers the main flow and most conditions, but it omits direct contracts helper dependencies, inaccurately narrows the blocker predicate to nonempty values, and includes an unsupported external-discovery claim."
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R1",
+      "arm": "A",
+      "anonymous_label": "X",
+      "run_id": "Q2-R1-A",
+      "correct_factual_claims": 7,
+      "false_factual_claims": 1,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 7,
+      "required_dependencies_missed": 2,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D5",
+        "D6",
+        "D7",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D4",
+        "D8"
+      ],
+      "dependency_recall": 0.7777777777777778,
+      "claim_precision": 0.875,
+      "critical_dependency_misses": [
+        "D4",
+        "D8"
+      ],
+      "critical_omission_count": 2,
+      "validator_critical_omission_notes": [
+        "Does not name the direct result-validator symbol `contracts.validate_execution_result` or the route-validator symbol `contracts.validate_route_decision`.",
+        "Does not report that the checked-in tree has no tests or executable consumer.",
+        "Does not explicitly state that the adapter's inferred TestResult field is not used by the router; it does state this later in substance.",
+        "Does not describe how uncaught subprocess exceptions other than TimeoutExpired and FileNotFoundError escape without an ExecutionResult."
+      ],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 1,
+      "unsupported_runtime_claims": [
+        "The statements that no tests were run and no files were modified are not verifiable from repository evidence."
+      ],
+      "citation_issue_count": 0,
+      "citation_issues": [],
+      "verdict": "partial",
+      "coverage_note": "The conditional control flow and route/counter behavior are largely covered. The false description of logs and missing named validator symbols and repository test/consumer inventory make this partial."
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R1",
+      "arm": "B",
+      "anonymous_label": "Y",
+      "run_id": "Q2-R1-B",
+      "correct_factual_claims": 5,
+      "false_factual_claims": 1,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 8,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D8"
+      ],
+      "dependency_recall": 0.8888888888888888,
+      "claim_precision": 0.8333333333333334,
+      "critical_dependency_misses": [
+        "D8"
+      ],
+      "critical_omission_count": 1,
+      "validator_critical_omission_notes": [
+        "Does not name `contracts.validate_route_decision` as the direct route contract validator.",
+        "Does not report that the checked-in tree has no tests or executable consumer.",
+        "Does not explicitly state that the inferred TestResult field does not affect route selection.",
+        "Does not describe that subprocess exceptions other than the two caught types escape without constructing an ExecutionResult."
+      ],
+      "unsupported_edge_count": 1,
+      "unsupported_edges": [
+        "The `[retrieval-system]` provenance claim is not a repository-supported call or data edge."
+      ],
+      "validator_flagged_unsupported_runtime_claim_count": 1,
+      "unsupported_runtime_claims": [
+        "The asserted retrieval-system mapping is not verifiable from repository source."
+      ],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The `[retrieval-system]` reference is not a source citation and invokes discovery provenance disallowed by the benchmark instructions."
+      ],
+      "verdict": "partial",
+      "coverage_note": "The described execution and routing logic is mostly accurate, but the logs claim is false and the answer omits the test/consumer inventory and explicit route-validator symbol."
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R2",
+      "arm": "A",
+      "anonymous_label": "Y",
+      "run_id": "Q2-R2-A",
+      "correct_factual_claims": 5,
+      "false_factual_claims": 1,
+      "unsupported_claims": 2,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 8,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D8"
+      ],
+      "dependency_recall": 0.8888888888888888,
+      "claim_precision": 0.8333333333333334,
+      "critical_dependency_misses": [
+        "D8"
+      ],
+      "critical_omission_count": 1,
+      "validator_critical_omission_notes": [
+        "Does not name `contracts.validate_route_decision` as the route contract gate.",
+        "Does not report that the checked-in tree has no tests or executable consumer.",
+        "Does not state explicitly that route selection ignores the inferred TestResult field.",
+        "Does not mention that subprocess exceptions other than TimeoutExpired and FileNotFoundError escape without an ExecutionResult."
+      ],
+      "unsupported_edge_count": 1,
+      "unsupported_edges": [
+        "The `[retrieval-system]` provenance is not a source-grounded dependency edge."
+      ],
+      "validator_flagged_unsupported_runtime_claim_count": 1,
+      "unsupported_runtime_claims": [
+        "The retrieval-system activity and the suggested intended threshold are not established by repository evidence."
+      ],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The `[retrieval-system]` reference is not a repository citation and relies on discovery provenance."
+      ],
+      "verdict": "partial",
+      "coverage_note": "Strong coverage of the conditional path and counter edge cases, but the answer misdescribes the log handling, includes unsupported provenance/intent, and omits the test inventory and explicit route-validator symbol."
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R2",
+      "arm": "B",
+      "anonymous_label": "X",
+      "run_id": "Q2-R2-B",
+      "correct_factual_claims": 6,
+      "false_factual_claims": 1,
+      "unsupported_claims": 2,
+      "required_dependencies_total": 9,
+      "required_dependencies_found": 8,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D8"
+      ],
+      "dependency_recall": 0.8888888888888888,
+      "claim_precision": 0.8571428571428571,
+      "critical_dependency_misses": [
+        "D8"
+      ],
+      "critical_omission_count": 1,
+      "validator_critical_omission_notes": [
+        "Does not name `contracts.validate_route_decision` as the direct route-validation dependency.",
+        "Does not report the absence of checked-in tests or an executable consumer.",
+        "Does not explicitly note that routing ignores the inferred tests field.",
+        "Does not state that other subprocess exceptions besides the two handled types escape without an ExecutionResult."
+      ],
+      "unsupported_edge_count": 1,
+      "unsupported_edges": [
+        "The `[retrieval-system]` statement is unsupported provenance, not a source-derived call or data edge."
+      ],
+      "validator_flagged_unsupported_runtime_claim_count": 1,
+      "unsupported_runtime_claims": [
+        "The retrieval-system activity and the answer author's no-tests/no-modification assertions are not established by repository evidence."
+      ],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The `[retrieval-system]` reference is not a source citation and invokes disallowed discovery provenance."
+      ],
+      "verdict": "partial",
+      "coverage_note": "The conditional test-failure example and second-failure counter path follow source. The log description is false, and the answer omits the route validator symbol and repository test/consumer inventory."
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R1",
+      "arm": "A",
+      "anonymous_label": "X",
+      "run_id": "Q3-R1-A",
+      "correct_factual_claims": 5,
+      "false_factual_claims": 1,
+      "unsupported_claims": 0,
+      "required_dependencies_total": 12,
+      "required_dependencies_found": 12,
+      "required_dependencies_missed": 0,
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D10",
+        "Q3-D11",
+        "Q3-D12",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8",
+        "Q3-D9"
+      ],
+      "required_dependency_ids_missed": [],
+      "dependency_recall": 1.0,
+      "claim_precision": 0.8333333333333334,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The docs/task link label contains a retrieval-system placeholder even though its target is the checked-in task document."
+      ],
+      "verdict": "partial",
+      "coverage_note": "Broad coverage of direct and indirect impact, with the repository file-count error. It explicitly identifies absent tests, schema, parser, and taxonomy documentation."
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R1",
+      "arm": "B",
+      "anonymous_label": "Y",
+      "run_id": "Q3-R1-B",
+      "correct_factual_claims": 5,
+      "false_factual_claims": 0,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 12,
+      "required_dependencies_found": 11,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D10",
+        "Q3-D11",
+        "Q3-D12",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8"
+      ],
+      "required_dependency_ids_missed": [
+        "Q3-D9"
+      ],
+      "dependency_recall": 0.9166666666666666,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [],
+      "unsupported_edge_count": 1,
+      "unsupported_edges": [
+        "The reported importedBy query result relies on external graph output; the actual imports are independently confirmed by source."
+      ],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The ExecutionResult.error_type and RouteDecision.source_error_type citations point to contracts.py:96 and :108, which are class declaration lines; the field declarations are at :99 and :114."
+      ],
+      "verdict": "partial",
+      "coverage_note": "The source-based impact map is broad. It omits validate_route_decision's lack of source_error_type membership checking and includes graph-query provenance that cannot serve as evidence under the instructions."
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R2",
+      "arm": "A",
+      "anonymous_label": "X",
+      "run_id": "Q3-R2-A",
+      "correct_factual_claims": 6,
+      "false_factual_claims": 0,
+      "unsupported_claims": 0,
+      "required_dependencies_total": 12,
+      "required_dependencies_found": 11,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D10",
+        "Q3-D11",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8",
+        "Q3-D9"
+      ],
+      "required_dependency_ids_missed": [
+        "Q3-D12"
+      ],
+      "dependency_recall": 0.9166666666666666,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The Markdown citations for validate_execution_result and validate_route_decision contain a space after the link parenthesis, making those citation links malformed."
+      ],
+      "verdict": "complete",
+      "coverage_note": "Covers all critical source dependencies and the required absence/runtime boundaries. It does not mention _build_summary, a noncritical direct consumer."
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R2",
+      "arm": "B",
+      "anonymous_label": "Y",
+      "run_id": "Q3-R2-B",
+      "correct_factual_claims": 7,
+      "false_factual_claims": 0,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 12,
+      "required_dependencies_found": 11,
+      "required_dependencies_missed": 1,
+      "required_dependency_ids_found": [
+        "Q3-D1",
+        "Q3-D10",
+        "Q3-D11",
+        "Q3-D12",
+        "Q3-D2",
+        "Q3-D3",
+        "Q3-D4",
+        "Q3-D5",
+        "Q3-D6",
+        "Q3-D7",
+        "Q3-D8"
+      ],
+      "required_dependency_ids_missed": [
+        "Q3-D9"
+      ],
+      "dependency_recall": 0.9166666666666666,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [],
+      "unsupported_edge_count": 1,
+      "unsupported_edges": [
+        "The related-test query result is external graph output and is unsupported; the source-tree inventory independently confirms no tracked tests."
+      ],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The retrieval-system test-query assertion has no admissible repository citation."
+      ],
+      "verdict": "partial",
+      "coverage_note": "The source-grounded impact map is strong but omits validate_route_decision's lack of source_error_type membership checking and reports a prohibited graph-query result."
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R1",
+      "arm": "A",
+      "anonymous_label": "Y",
+      "run_id": "Q4-R1-A",
+      "correct_factual_claims": 7,
+      "false_factual_claims": 0,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 13,
+      "required_dependencies_found": 11,
+      "required_dependencies_missed": 2,
+      "required_dependency_ids_found": [
+        "D1",
+        "D10",
+        "D11",
+        "D13",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D7",
+        "D8",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D12",
+        "D6"
+      ],
+      "dependency_recall": 0.8461538461538461,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [
+        "Does not explicitly state that a retry invokes run_codex again with the same ExecutionInput and unchanged metadata, so persistence of the configured timeout across retries is implicit."
+      ],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The cited timeout-handler, routing, and task-document lines are relevant. The broad subprocess-call citation at codex_run.py:40 could be made more exact by citing lines 40-46."
+      ],
+      "verdict": "partial",
+      "coverage_note": "Strong source coverage, including the separate task-document policy. The retry path does not explicitly close the loop back to the same configured timeout."
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R1",
+      "arm": "B",
+      "anonymous_label": "X",
+      "run_id": "Q4-R1-B",
+      "correct_factual_claims": 8,
+      "false_factual_claims": 0,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 13,
+      "required_dependencies_found": 10,
+      "required_dependencies_missed": 3,
+      "required_dependency_ids_found": [
+        "D1",
+        "D10",
+        "D11",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D7",
+        "D8",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D12",
+        "D13",
+        "D6"
+      ],
+      "dependency_recall": 0.7692307692307693,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [
+        "Does not explicitly connect RETRY_CODEX back to another run_codex call with the same ExecutionInput and unchanged timeout metadata, so the configured timeout's persistence across retries is left implicit."
+      ],
+      "unsupported_edge_count": 1,
+      "unsupported_edges": [
+        "The retrieval-system provenance claim is not repository evidence; the direct main.py calls themselves are source-confirmed."
+      ],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 3,
+      "citation_issues": [
+        "The ExecutionInput link points to contracts.py:79, the class declaration; metadata is at contracts.py:84.",
+        "The subprocess-call link at codex_run.py:40 begins the call but does not point directly to the timeout argument at line 45.",
+        "The duration citation at codex_run.py:78 is the TimeoutExpired branch; normal-return duration is calculated at line 48."
+      ],
+      "verdict": "partial",
+      "coverage_note": "The source flow is otherwise traced accurately, including the stuck-loop history duplication and the documented-versus-runtime boundary. The answer includes unsupported discovery provenance and leaves retry reuse of the configured timeout unstated."
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R2",
+      "arm": "A",
+      "anonymous_label": "X",
+      "run_id": "Q4-R2-A",
+      "correct_factual_claims": 10,
+      "false_factual_claims": 0,
+      "unsupported_claims": 1,
+      "required_dependencies_total": 13,
+      "required_dependencies_found": 11,
+      "required_dependencies_missed": 2,
+      "required_dependency_ids_found": [
+        "D1",
+        "D10",
+        "D11",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D12",
+        "D13"
+      ],
+      "dependency_recall": 0.8461538461538461,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [],
+      "unsupported_edge_count": 0,
+      "unsupported_edges": [],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 2,
+      "citation_issues": [
+        "The combined citation contracts.py:71 supports RunPolicy, not ExecutionInput.metadata; the metadata field is at contracts.py:84.",
+        "The run_codex citation at codex_run.py:36 points to the try-block start; the subprocess call and timeout argument are at lines 40-46."
+      ],
+      "verdict": "complete",
+      "coverage_note": "Complete trace of timeout selection, exception versus normal classification, routing, stuck-loop behavior, retry input reuse, and max-cycle/fatal exits. Repair-hook details and the separate task-document policy are noncritical omissions for this trace."
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R2",
+      "arm": "B",
+      "anonymous_label": "Y",
+      "run_id": "Q4-R2-B",
+      "correct_factual_claims": 10,
+      "false_factual_claims": 0,
+      "unsupported_claims": 2,
+      "required_dependencies_total": 13,
+      "required_dependencies_found": 11,
+      "required_dependencies_missed": 2,
+      "required_dependency_ids_found": [
+        "D1",
+        "D10",
+        "D11",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9"
+      ],
+      "required_dependency_ids_missed": [
+        "D12",
+        "D13"
+      ],
+      "dependency_recall": 0.8461538461538461,
+      "claim_precision": 1.0,
+      "critical_dependency_misses": [],
+      "critical_omission_count": 0,
+      "validator_critical_omission_notes": [
+        "Does not explicitly state that retry re-invokes run_codex with the same ExecutionInput and unchanged timeout metadata, so it does not close the configured-timeout flow across retries."
+      ],
+      "unsupported_edge_count": 1,
+      "unsupported_edges": [
+        "The retrieval-system provenance claim is unsupported; the direct source calls are present in main.py."
+      ],
+      "validator_flagged_unsupported_runtime_claim_count": 0,
+      "unsupported_runtime_claims": [],
+      "citation_issue_count": 1,
+      "citation_issues": [
+        "The source line references for the timeout, routing, and max-cycle claims are substantially accurate; the retrieval-system provenance has no source citation."
+      ],
+      "verdict": "partial",
+      "coverage_note": "Most source behavior is accurately described, but the answer includes unsupported discovery provenance and leaves timeout reuse across retries implicit."
+    }
+  ],
+  "arm_aggregates": {
+    "A": {
+      "answers": 8,
+      "required_dependencies_found": 74,
+      "required_dependencies_total": 86,
+      "dependency_recall": 0.8604651162790697,
+      "correct_factual_claims": 58,
+      "false_factual_claims": 4,
+      "unsupported_claims": 5,
+      "claim_precision": 0.9354838709677419,
+      "critical_dependency_miss_count": 7,
+      "unsupported_edge_count": 1,
+      "validator_flagged_unsupported_runtime_claim_count": 2,
+      "citation_issue_count": 6,
+      "median_wall_seconds": 187.748,
+      "median_tool_calls": 6.0,
+      "median_search_calls": 2.0,
+      "median_grep_calls": 0.0,
+      "median_read_calls": 4.0,
+      "median_unique_files_read": null,
+      "median_unique_files_referenced": 4.0,
+      "median_input_tokens": 82971.5,
+      "median_output_tokens": 7159.5,
+      "median_cached_tokens": 60928.0,
+      "median_total_tokens": 89853.0,
+      "median_retrieval_bytes": 48609.0,
+      "median_retrieval_tokens": null,
+      "median_codegraph_calls": 0.0
+    },
+    "B": {
+      "answers": 8,
+      "required_dependencies_found": 73,
+      "required_dependencies_total": 86,
+      "dependency_recall": 0.8488372093023255,
+      "correct_factual_claims": 58,
+      "false_factual_claims": 4,
+      "unsupported_claims": 9,
+      "claim_precision": 0.9354838709677419,
+      "critical_dependency_miss_count": 6,
+      "unsupported_edge_count": 6,
+      "validator_flagged_unsupported_runtime_claim_count": 2,
+      "citation_issue_count": 9,
+      "median_wall_seconds": 271.986,
+      "median_tool_calls": 12.0,
+      "median_search_calls": 9.0,
+      "median_grep_calls": 0.0,
+      "median_read_calls": 5.0,
+      "median_unique_files_read": null,
+      "median_unique_files_referenced": 4.0,
+      "median_input_tokens": 259873.5,
+      "median_output_tokens": 13135.5,
+      "median_cached_tokens": 212736.0,
+      "median_total_tokens": 273669.0,
+      "median_retrieval_bytes": 60206.0,
+      "median_retrieval_tokens": null,
+      "median_codegraph_calls": 5.5
+    }
+  },
+  "paired_wall_time_differences": [
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R1",
+      "A_wall_seconds": 269.237,
+      "B_wall_seconds": 216.376,
+      "wall_time_saved_A_minus_B_seconds": 52.861,
+      "A_tool_calls": 11,
+      "B_tool_calls": 13,
+      "A_total_tokens": 91747,
+      "B_total_tokens": 175241
+    },
+    {
+      "benchmark_id": "Q1",
+      "repeat": "R2",
+      "A_wall_seconds": 225.218,
+      "B_wall_seconds": 538.115,
+      "wall_time_saved_A_minus_B_seconds": -312.897,
+      "A_tool_calls": 10,
+      "B_tool_calls": 9,
+      "A_total_tokens": 87959,
+      "B_total_tokens": 331943
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R1",
+      "A_wall_seconds": 187.944,
+      "B_wall_seconds": 189.603,
+      "wall_time_saved_A_minus_B_seconds": -1.659,
+      "A_tool_calls": 6,
+      "B_tool_calls": 11,
+      "A_total_tokens": 63990,
+      "B_total_tokens": 173298
+    },
+    {
+      "benchmark_id": "Q2",
+      "repeat": "R2",
+      "A_wall_seconds": 144.997,
+      "B_wall_seconds": 198.586,
+      "wall_time_saved_A_minus_B_seconds": -53.589,
+      "A_tool_calls": 6,
+      "B_tool_calls": 6,
+      "A_total_tokens": 79176,
+      "B_total_tokens": 173826
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R1",
+      "A_wall_seconds": 170.83,
+      "B_wall_seconds": 340.769,
+      "wall_time_saved_A_minus_B_seconds": -169.939,
+      "A_tool_calls": 6,
+      "B_tool_calls": 24,
+      "A_total_tokens": 150322,
+      "B_total_tokens": 336513
+    },
+    {
+      "benchmark_id": "Q3",
+      "repeat": "R2",
+      "A_wall_seconds": 212.064,
+      "B_wall_seconds": 299.465,
+      "wall_time_saved_A_minus_B_seconds": -87.401,
+      "A_tool_calls": 24,
+      "B_tool_calls": 30,
+      "A_total_tokens": 326864,
+      "B_total_tokens": 296028
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R1",
+      "A_wall_seconds": 166.938,
+      "B_wall_seconds": 280.755,
+      "wall_time_saved_A_minus_B_seconds": -113.817,
+      "A_tool_calls": 4,
+      "B_tool_calls": 15,
+      "A_total_tokens": 114067,
+      "B_total_tokens": 274862
+    },
+    {
+      "benchmark_id": "Q4",
+      "repeat": "R2",
+      "A_wall_seconds": 187.552,
+      "B_wall_seconds": 263.217,
+      "wall_time_saved_A_minus_B_seconds": -75.665,
+      "A_tool_calls": 3,
+      "B_tool_calls": 11,
+      "A_total_tokens": 86849,
+      "B_total_tokens": 272476
+    }
+  ],
+  "safety_gate": {
+    "status": "FAIL",
+    "new_critical_dependency_misses": [
+      {
+        "benchmark_id": "Q1",
+        "repeat": "R2",
+        "arm": "B",
+        "new_critical_dependency_ids_missed_vs_paired_A": [
+          "D6",
+          "D7"
+        ],
+        "paired_A_critical_dependency_ids_missed": [
+          "D8"
+        ],
+        "B_critical_dependency_ids_missed": [
+          "D6",
+          "D7",
+          "D8"
+        ]
+      }
+    ],
+    "unsupported_static_relationship_presented_as_runtime_truth": "PASS: none identified by Q4 validators; Q2 provenance flags were external graph provenance, not runtime truth claims"
+  },
+  "utility_gate": {
+    "status": "FAIL",
+    "reason": "Arm B median wall time, tool calls, total tokens, search calls, and retrieval bytes exceeded Arm A; unique referenced-file medians were equal; unique_files_read and retrieval_tokens were unavailable."
+  },
+  "setup_cost": {
+    "T_setup_seconds": 582,
+    "T_query_first_measured_codegraph_use_seconds": 216.376,
+    "T_first_use_seconds": 798.376,
+    "median_A_minus_B_wall_saving_per_task_seconds": -81.533,
+    "break_even_tasks": null
+  },
+  "operator_trace_audit": {
+    "measured_sessions": 16,
+    "unique_thread_ids": 16,
+    "test_runner_invocations_observed": 0,
+    "worktree_clean_before_and_after": true,
+    "source_tree_changed": false,
+    "mcp_tool_calls_by_arm": {
+      "A": 0,
+      "B": 55
+    }
+  }
+}
