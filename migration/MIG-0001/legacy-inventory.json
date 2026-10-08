@@ -1,0 +1,224 @@
+{
+  "task_id": "MIG-0001-FOUR-REPO-LEGACY-EVIDENCE-AUDIT-2026-10-08",
+  "executor": "CodexC",
+  "observed_utc": "2026-10-08T07:35:06Z",
+  "source_urls": {
+    "suncaifeng/DevSopByAi": "git@github.com:suncaifeng/DevSopByAi.git",
+    "suncaifeng/comfyui-minimax-h3": "git@github.com:suncaifeng/comfyui-minimax-h3.git"
+  },
+  "task_contract_identity": {
+    "task_path": "docs/tasks/MIG-0001-FOUR-REPO-LEGACY-EVIDENCE-AUDIT-2026-10-08.md",
+    "blob_sha1": "337d963d62988c084809c082bca48a47c4faa66a",
+    "created_from_head": "e3c609f5cdbe38bca7e17b87359f29817d91237b",
+    "branch": "tasks/mig-0001-four-repo-legacy-evidence-audit",
+    "starting_head": "439e41dfda14ee591895a2de670d445e13cc82bf",
+    "immutability_check": "PASS"
+  },
+  "repositories": [
+    {
+      "repository": "suncaifeng/DevSopByAi",
+      "remote_url": "git@github.com:suncaifeng/DevSopByAi.git",
+      "default_branch": "main",
+      "default_head": "e3c609f5cdbe38bca7e17b87359f29817d91237b",
+      "advertised_head_refs": [
+        {
+          "ref": "refs/heads/codex/codegraph-controlled-ab-codexb",
+          "sha": "48b8db0852eae19b24ec9a257d67703b8a048e81"
+        },
+        {
+          "ref": "refs/heads/main",
+          "sha": "e3c609f5cdbe38bca7e17b87359f29817d91237b"
+        },
+        {
+          "ref": "refs/heads/tasks/mig-0001-four-repo-legacy-evidence-audit",
+          "sha": "439e41dfda14ee591895a2de670d445e13cc82bf"
+        }
+      ],
+      "other_advertised_refs": [],
+      "known_inaccessible_refs": [],
+      "visibility_note": "Only refs advertised to the authenticated Git client are enumerable; hidden refs cannot be inferred.",
+      "accessible_branch_count": 3,
+      "unique_paths_across_heads": 107,
+      "unique_path_blob_versions_across_heads": 107,
+      "branch_tree_path_occurrences": 119,
+      "branch_occurrences_by_top_level_prefix": {
+        "\"\\345\\274\\200\\345\\217\\221SOP\\346\\265\\201\\347\\250\\213\\344\\270\\216\\346\\217\\220\\347\\244\\272\\350\\257\\215.md\"": 3,
+        "codex_run.py": 3,
+        "contracts.py": 3,
+        "docs": 104,
+        "main.py": 3,
+        "routing_system.py": 3
+      },
+      "unique_task_contract_path_blob_versions": 3,
+      "unique_report_path_blob_versions": 0,
+      "unique_report_evidence_path_blob_versions": 0,
+      "unique_experiment_path_blob_versions": 99,
+      "unique_review_path_blob_versions": 0,
+      "unique_control_path_blob_versions": 0,
+      "unique_machine_manifest_path_blob_versions": 0
+    },
+    {
+      "repository": "suncaifeng/comfyui-minimax-h3",
+      "remote_url": "git@github.com:suncaifeng/comfyui-minimax-h3.git",
+      "default_branch": "main",
+      "default_head": "644d7ff2a7a00e04db94ab347a85ed61488d5a76",
+      "advertised_head_refs": [
+        {
+          "ref": "refs/heads/codex/codexc-model-asset-acquisition-publish",
+          "sha": "ed0abf46b1733e9e0e4dd60e91379000880f6950"
+        },
+        {
+          "ref": "refs/heads/codex/codexc-pinkcherry-ltx23-q6kv-refresh",
+          "sha": "a1976cfcc4a5f93fd8d02b8e50a9873a4aba8e49"
+        },
+        {
+          "ref": "refs/heads/codex/h3-ltx-director-console-v2-corrective-delta-01",
+          "sha": "3968742392a8967325c4a9a2c3f6c81776e00c02"
+        },
+        {
+          "ref": "refs/heads/codex/h3-ltx-director-console-v2-holiday-codeb",
+          "sha": "ca8c43b1e1bba98ba0c74c24681475caba1ae958"
+        },
+        {
+          "ref": "refs/heads/codex/h3storyboard-director-console-v2-holiday-codeb",
+          "sha": "1ef0053dcaec64e2f125ba5cdea3185669ca24d9"
+        },
+        {
+          "ref": "refs/heads/codex/holiday-onecat-native-benchmark-campaign",
+          "sha": "c2367764930804e5e518fc2609a7efb8e45a7dbb"
+        },
+        {
+          "ref": "refs/heads/codex/holiday-relay-supervisor-codec",
+          "sha": "afe6311af8586336ef240a14fc4395569547d57e"
+        },
+        {
+          "ref": "refs/heads/codex/onecat-native-v150-awq-vlk-quality-c64-corrective-delta",
+          "sha": "c8198aad96bab6e62c6a38cbcc726096abd72e8c"
+        },
+        {
+          "ref": "refs/heads/codex/onecat-native-v150-awq-vlk-quality-c64-delta",
+          "sha": "5327ff5bd43e11c2b25a800027a07a9142993d7f"
+        },
+        {
+          "ref": "refs/heads/codex/onecat-native-v150-awq-vlk-recovery",
+          "sha": "cbfd70e5718bd05c03c6afe7d9b056b884100bd6"
+        },
+        {
+          "ref": "refs/heads/codex/onecat-native-v150-c64-canonical-readiness",
+          "sha": "760214ae64bc28d8a8485320c0937b9a9142a725"
+        },
+        {
+          "ref": "refs/heads/codex/onecat-native-v150-preflight",
+          "sha": "bd78b9c1f494af95108a0220a523a980e0b9b9a9"
+        },
+        {
+          "ref": "refs/heads/codex/onecat-qwen38-gguf-loader-patch",
+          "sha": "26af29a8672112f2b780a1deab3ea1bf7c4d1570"
+        },
+        {
+          "ref": "refs/heads/codex/task2.1-offline-harness",
+          "sha": "7040be99608c62d6306c348e1a980cb8076d5242"
+        },
+        {
+          "ref": "refs/heads/codex/task2.2-canonical-benchmark-input-freeze",
+          "sha": "227835bbe958b26b61be047d59eff4dcee98eab2"
+        },
+        {
+          "ref": "refs/heads/codex/task2.3-kvmem-harness-sync",
+          "sha": "4105cb114a1c4ead8cf91b14cfbb5705606b2550"
+        },
+        {
+          "ref": "refs/heads/codex/task2.4-prebenchmark-offline-readiness",
+          "sha": "099c342880f80222110afc969ca19ae25bc08a23"
+        },
+        {
+          "ref": "refs/heads/codex/three-runtime-c64-canonical-transport-remediation",
+          "sha": "ffc5c7418c3cd62bb0ae24ee8b5172893970a382"
+        },
+        {
+          "ref": "refs/heads/codex/three-runtime-c64-cross-runtime-calibration",
+          "sha": "c086b2006ea0110b831c78426fd0b7c7a1164225"
+        },
+        {
+          "ref": "refs/heads/codex/three-runtime-c64-quality-gate-policy-corrective-delta",
+          "sha": "5d6abaabbba7c5669b4d945beee8010ecb633f18"
+        },
+        {
+          "ref": "refs/heads/codex/three-runtime-c64-quality-gate-policy-freeze",
+          "sha": "c5130df7735fa8448baa8999b9c7fbefcab0000b"
+        },
+        {
+          "ref": "refs/heads/codex/vm176-v100-power-hbm-thermal-characterization",
+          "sha": "b3911fa5c6fd1c4597a6c08a9c85d57afd2bed59"
+        },
+        {
+          "ref": "refs/heads/control/holiday-codea-to-codeb-relay",
+          "sha": "c5839951b184f8c5b3d882eb0413efe1725a2b64"
+        },
+        {
+          "ref": "refs/heads/main",
+          "sha": "644d7ff2a7a00e04db94ab347a85ed61488d5a76"
+        }
+      ],
+      "other_advertised_refs": [],
+      "known_inaccessible_refs": [],
+      "visibility_note": "Only refs advertised to the authenticated Git client are enumerable; hidden refs cannot be inferred.",
+      "accessible_branch_count": 24,
+      "unique_paths_across_heads": 581,
+      "unique_path_blob_versions_across_heads": 607,
+      "branch_tree_path_occurrences": 7021,
+      "branch_occurrences_by_top_level_prefix": {
+        ".gitignore": 24,
+        "README.md": 24,
+        "benchmarks": 837,
+        "config": 96,
+        "control": 2,
+        "docs": 1707,
+        "ops": 198,
+        "patches": 8,
+        "reports": 3541,
+        "scripts": 363,
+        "systemd": 120,
+        "tests": 29,
+        "workflows": 72
+      },
+      "unique_task_contract_path_blob_versions": 83,
+      "unique_report_path_blob_versions": 354,
+      "unique_report_evidence_path_blob_versions": 273,
+      "unique_experiment_path_blob_versions": 0,
+      "unique_review_path_blob_versions": 0,
+      "unique_control_path_blob_versions": 1,
+      "unique_machine_manifest_path_blob_versions": 112
+    }
+  ],
+  "task_records": {
+    "unique_contract_path_blob_versions_total": 86,
+    "status_csv_rows": 86,
+    "status_counts": {
+      "COMPLETE_UNREVIEWED": 18,
+      "UNKNOWN": 50,
+      "PARTIAL": 5,
+      "BLOCKED": 13
+    },
+    "review_artifacts_accessible": 0,
+    "note": "TaskContract READY is not a terminal result. Report result parsing uses summary documents; self-reported COMPLETE/PASS maps to COMPLETE_UNREVIEWED absent an independent accepted Review. Raw evidence logs were inventoried by path/hash but not copied. The H3 V100 power/HBM thermal TaskContract and a matching BLOCKED read-only preflight report appeared during this audit; no cap change or H3/LLM workload was reported, and CodexC did not start it."
+  },
+  "runtime_access": {
+    "vm172": "UNVERIFIED: existing non-interactive SSH attempt failed host-key verification; no trust override used.",
+    "vm176": "LIVE_VERIFIED read-only at 2026-10-08T07:21:19Z; see runtime-truth.md.",
+    "vm179": "UNVERIFIED: existing non-interactive SSH attempt returned No route to host.",
+    "proposed_repo_api_status": {
+      "suncaifeng/gpu-compute": "GitHub public API returned HTTP 404; existence/private status ambiguous; no create attempt.",
+      "suncaifeng/llm-inference": "GitHub public API returned HTTP 404; existence/private status ambiguous; no create attempt.",
+      "suncaifeng/video-generation": "GitHub public API returned HTTP 404; existence/private status ambiguous; no create attempt."
+    }
+  },
+  "scope_limits": [
+    "Only Git-advertised refs are enumerable; hidden refs cannot be inferred.",
+    "No independent reviews directory/files were found on accessible refs.",
+    "VM172 and VM179 runtime truth remains UNVERIFIED.",
+    "Model assets were inventoried as repository references/metadata only; no model bytes copied or inspected.",
+    "Raw execution logs, response payloads and credential stores were not copied into outputs.",
+    "Public GitHub 404 responses do not distinguish absent from private/inaccessible repositories."
+  ]
+}

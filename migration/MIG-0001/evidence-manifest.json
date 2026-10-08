@@ -1,0 +1,364 @@
+{
+  "task_id": "MIG-0001-FOUR-REPO-LEGACY-EVIDENCE-AUDIT-2026-10-08",
+  "contract_path": "docs/tasks/MIG-0001-FOUR-REPO-LEGACY-EVIDENCE-AUDIT-2026-10-08.md",
+  "contract_blob_sha1": "337d963d62988c084809c082bca48a47c4faa66a",
+  "created_from_head": "e3c609f5cdbe38bca7e17b87359f29817d91237b",
+  "branch": "tasks/mig-0001-four-repo-legacy-evidence-audit",
+  "starting_head": "439e41dfda14ee591895a2de670d445e13cc82bf",
+  "observed_utc": "2026-10-08T07:37:34Z",
+  "result": "PARTIAL",
+  "source_refs_commits_sets": {
+    "ALL_ACCESSIBLE_LEGACY_HEADS": [
+      {
+        "repository": "suncaifeng/DevSopByAi",
+        "ref": "refs/heads/codex/codegraph-controlled-ab-codexb",
+        "head_sha": "48b8db0852eae19b24ec9a257d67703b8a048e81"
+      },
+      {
+        "repository": "suncaifeng/DevSopByAi",
+        "ref": "refs/heads/main",
+        "head_sha": "e3c609f5cdbe38bca7e17b87359f29817d91237b"
+      },
+      {
+        "repository": "suncaifeng/DevSopByAi",
+        "ref": "refs/heads/tasks/mig-0001-four-repo-legacy-evidence-audit",
+        "head_sha": "439e41dfda14ee591895a2de670d445e13cc82bf"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/codexc-model-asset-acquisition-publish",
+        "head_sha": "ed0abf46b1733e9e0e4dd60e91379000880f6950"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/codexc-pinkcherry-ltx23-q6kv-refresh",
+        "head_sha": "a1976cfcc4a5f93fd8d02b8e50a9873a4aba8e49"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/h3-ltx-director-console-v2-corrective-delta-01",
+        "head_sha": "3968742392a8967325c4a9a2c3f6c81776e00c02"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/h3-ltx-director-console-v2-holiday-codeb",
+        "head_sha": "ca8c43b1e1bba98ba0c74c24681475caba1ae958"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/h3storyboard-director-console-v2-holiday-codeb",
+        "head_sha": "1ef0053dcaec64e2f125ba5cdea3185669ca24d9"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/holiday-onecat-native-benchmark-campaign",
+        "head_sha": "c2367764930804e5e518fc2609a7efb8e45a7dbb"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/holiday-relay-supervisor-codec",
+        "head_sha": "afe6311af8586336ef240a14fc4395569547d57e"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/onecat-native-v150-awq-vlk-quality-c64-corrective-delta",
+        "head_sha": "c8198aad96bab6e62c6a38cbcc726096abd72e8c"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/onecat-native-v150-awq-vlk-quality-c64-delta",
+        "head_sha": "5327ff5bd43e11c2b25a800027a07a9142993d7f"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/onecat-native-v150-awq-vlk-recovery",
+        "head_sha": "cbfd70e5718bd05c03c6afe7d9b056b884100bd6"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/onecat-native-v150-c64-canonical-readiness",
+        "head_sha": "760214ae64bc28d8a8485320c0937b9a9142a725"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/onecat-native-v150-preflight",
+        "head_sha": "bd78b9c1f494af95108a0220a523a980e0b9b9a9"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/onecat-qwen38-gguf-loader-patch",
+        "head_sha": "26af29a8672112f2b780a1deab3ea1bf7c4d1570"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/task2.1-offline-harness",
+        "head_sha": "7040be99608c62d6306c348e1a980cb8076d5242"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/task2.2-canonical-benchmark-input-freeze",
+        "head_sha": "227835bbe958b26b61be047d59eff4dcee98eab2"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/task2.3-kvmem-harness-sync",
+        "head_sha": "4105cb114a1c4ead8cf91b14cfbb5705606b2550"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/task2.4-prebenchmark-offline-readiness",
+        "head_sha": "099c342880f80222110afc969ca19ae25bc08a23"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/three-runtime-c64-canonical-transport-remediation",
+        "head_sha": "ffc5c7418c3cd62bb0ae24ee8b5172893970a382"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/three-runtime-c64-cross-runtime-calibration",
+        "head_sha": "c086b2006ea0110b831c78426fd0b7c7a1164225"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/three-runtime-c64-quality-gate-policy-corrective-delta",
+        "head_sha": "5d6abaabbba7c5669b4d945beee8010ecb633f18"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/three-runtime-c64-quality-gate-policy-freeze",
+        "head_sha": "c5130df7735fa8448baa8999b9c7fbefcab0000b"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/vm176-v100-power-hbm-thermal-characterization",
+        "head_sha": "b3911fa5c6fd1c4597a6c08a9c85d57afd2bed59"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/control/holiday-codea-to-codeb-relay",
+        "head_sha": "c5839951b184f8c5b3d882eb0413efe1725a2b64"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/main",
+        "head_sha": "644d7ff2a7a00e04db94ab347a85ed61488d5a76"
+      }
+    ],
+    "SELECTED_DOMAIN_HEADS": [
+      {
+        "repository": "suncaifeng/DevSopByAi",
+        "ref": "refs/heads/main",
+        "commit_sha": "e3c609f5cdbe38bca7e17b87359f29817d91237b"
+      },
+      {
+        "repository": "suncaifeng/DevSopByAi",
+        "ref": "refs/heads/codex/codegraph-controlled-ab-codexb",
+        "commit_sha": "48b8db0852eae19b24ec9a257d67703b8a048e81"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/main",
+        "commit_sha": "644d7ff2a7a00e04db94ab347a85ed61488d5a76"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/task2.1-offline-harness",
+        "commit_sha": "7040be99608c62d6306c348e1a980cb8076d5242"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/three-runtime-c64-cross-runtime-calibration",
+        "commit_sha": "c086b2006ea0110b831c78426fd0b7c7a1164225"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/three-runtime-c64-canonical-transport-remediation",
+        "commit_sha": "ffc5c7418c3cd62bb0ae24ee8b5172893970a382"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/h3-ltx-director-console-v2-holiday-codeb",
+        "commit_sha": "ca8c43b1e1bba98ba0c74c24681475caba1ae958"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/h3-ltx-director-console-v2-corrective-delta-01",
+        "commit_sha": "3968742392a8967325c4a9a2c3f6c81776e00c02"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/holiday-relay-supervisor-codec",
+        "commit_sha": "afe6311af8586336ef240a14fc4395569547d57e"
+      },
+      {
+        "repository": "suncaifeng/comfyui-minimax-h3",
+        "ref": "refs/heads/codex/vm176-v100-power-hbm-thermal-characterization",
+        "commit_sha": "f006249fd1fe1462553df1f51e852f3e9baf72f1",
+        "subsequent_report_head": "b3911fa5c6fd1c4597a6c08a9c85d57afd2bed59"
+      }
+    ],
+    "VM176_LIVE_READ_ONLY": [
+      {
+        "host": "10.145.45.76",
+        "hostname": "compute",
+        "observed_utc": [
+          "2026-10-08T07:21:19Z",
+          "2026-10-08T07:34:02Z"
+        ],
+        "runtime_checkout_commit": "c2bcbecd82ec5ae66594340b395c24ef0217b238",
+        "relay_worktree_commit": "afe6311af8586336ef240a14fc4395569547d57e",
+        "thermal_preflight_report_commit": "b3911fa5c6fd1c4597a6c08a9c85d57afd2bed59"
+      }
+    ],
+    "VM172_UNVERIFIED": [
+      {
+        "host": "10.145.45.72",
+        "observed_utc": "2026-10-08T07:25:55Z",
+        "status": "UNVERIFIED",
+        "reason": "Host key verification failed; no override used."
+      }
+    ],
+    "VM179_UNVERIFIED": [
+      {
+        "host": "10.145.45.79",
+        "observed_utc": "2026-10-08T07:25:55Z",
+        "status": "UNVERIFIED",
+        "reason": "No route to host."
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "path": "migration/MIG-0001/legacy-inventory.json",
+      "sha256": "1154996743f85a8e7841968c501b32c4a44a0e7b45b7bf684389ae3e5a5a6a7f",
+      "size_bytes": 9646,
+      "source_refs_commits_sets": [
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/branch-lineage.csv",
+      "sha256": "24ea95addae4ebba1aa30c90526bb26f7419cb2635542bedf227cea2d9363fd7",
+      "size_bytes": 8625,
+      "source_refs_commits_sets": [
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/task-status.csv",
+      "sha256": "b24fb4503a0ed87dfbdf3a6ee246a00f4e048cecd22a42f34e3895ee99b289b3",
+      "size_bytes": 181190,
+      "source_refs_commits_sets": [
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/ownership-proposal.csv",
+      "sha256": "7e5cf68c8dc685ac0b70ea9d49b08ed7da95424d19373ea1f75819c234716ecd",
+      "size_bytes": 754499,
+      "source_refs_commits_sets": [
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/final-report.md",
+      "sha256": "dab2bab828a692ae32d4592ed11d45d3281617758fc4b491e78942dcb0e66a81",
+      "size_bytes": 8930,
+      "source_refs_commits_sets": [
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/runtime-truth.md",
+      "sha256": "2802777049f39a29d31b94398b1f04decff8d67a85ea2d671979625761fd16f6",
+      "size_bytes": 6471,
+      "source_refs_commits_sets": [
+        "SELECTED_DOMAIN_HEADS",
+        "VM176_LIVE_READ_ONLY",
+        "VM172_UNVERIFIED",
+        "VM179_UNVERIFIED"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/dependency-map.md",
+      "sha256": "f1f40767e21f76b270deb5b68604fc2278a42820a1624b9f48ed71241911c4fe",
+      "size_bytes": 7288,
+      "source_refs_commits_sets": [
+        "SELECTED_DOMAIN_HEADS",
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/risk-register.md",
+      "sha256": "9124128130d28eb37cf69bf37dca1f2f2d87d5cf85b601942fc4016098d2ed63",
+      "size_bytes": 9245,
+      "source_refs_commits_sets": [
+        "SELECTED_DOMAIN_HEADS",
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "PASS"
+    },
+    {
+      "path": "migration/MIG-0001/evidence-manifest.json",
+      "sha256": null,
+      "size_bytes": "self-referential; unavailable by construction",
+      "source_refs_commits_sets": [
+        "ALL_ACCESSIBLE_LEGACY_HEADS"
+      ],
+      "validation_status": "SELF_HASH_EXCLUDED; final Git blob/commit identity supplied by pushed handoff"
+    }
+  ],
+  "checks": [
+    {
+      "name": "repository_branch_task_blob_created_from_head",
+      "result": "PASS",
+      "scope": "Exact repository, branch, TaskContract blob SHA1, CREATED_FROM_HEAD and ancestry."
+    },
+    {
+      "name": "all_advertised_refs_lineage",
+      "result": "PASS",
+      "scope": "All Git-advertised branch refs in both source repositories, refreshed after H3 thermal branch advanced; hidden refs are not inferable."
+    },
+    {
+      "name": "task_report_review_delta_inventory",
+      "result": "PASS_WITH_UNKNOWN_ROWS",
+      "scope": "86 TaskContract path/blob versions; matching report results include the V100 task BLOCKED; no independent Review files found; unmatched rows remain UNKNOWN."
+    },
+    {
+      "name": "runtime_truth",
+      "result": "PARTIAL",
+      "scope": "VM176 read-only; VM172 and VM179 UNVERIFIED."
+    },
+    {
+      "name": "json_csv_cross_reference_validation",
+      "result": "PASS",
+      "scope": "JSON parsers, CSV headers, task/path/hash refs, current remote refs and exact allowlist."
+    },
+    {
+      "name": "taskcontract_immutability_and_git_diff_check",
+      "result": "PASS",
+      "scope": "TaskContract blob unchanged; git diff --check; only authorized paths."
+    },
+    {
+      "name": "gpu_model_production_mutation",
+      "result": "PASS",
+      "scope": "No CodexC GPU/model workloads; no VM/service or remote repository mutation."
+    }
+  ],
+  "scope_limits": [
+    "The manifest does not recursively hash itself. Its own SHA256 is excluded by design; final pushed Git blob/commit identity is supplied in the handoff.",
+    "Only refs advertised by authenticated Git remotes are enumerable; hidden refs cannot be inferred.",
+    "VM172 and VM179 were inaccessible through existing non-interactive read-only connection path.",
+    "Public GitHub API 404 does not distinguish nonexistent from private/inaccessible proposed repositories.",
+    "The separate V100 thermal task report is GIT_REPORTED and says BLOCKED before any cap change/workload; CodexC did not start it.",
+    "No model bytes, credentials or raw runtime logs were copied into these outputs."
+  ]
+}
