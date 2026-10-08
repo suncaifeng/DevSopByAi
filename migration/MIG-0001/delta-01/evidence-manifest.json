@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0",
+  "task_id": "MIG-0001-RUNTIME-TRUTH-CORRECTIVE-DELTA-01-2026-10-08",
+  "result": "PARTIAL",
+  "repository": "suncaifeng/DevSopByAi",
+  "authoritative_branch": "tasks/mig-0001-runtime-truth-corrective-delta-01",
+  "input_git": {
+    "task_contract_path": "docs/tasks/MIG-0001-RUNTIME-TRUTH-CORRECTIVE-DELTA-01-2026-10-08.md",
+    "task_contract_blob_sha1": "69517ac6ee737d0e9b9c5b9056c24157c03aa8ec",
+    "parent_task_path": "docs/tasks/MIG-0001-FOUR-REPO-LEGACY-EVIDENCE-AUDIT-2026-10-08.md",
+    "parent_task_blob_sha1": "337d963d62988c084809c082bca48a47c4faa66a",
+    "parent_report_path": "migration/MIG-0001/final-report.md",
+    "parent_report_blob_sha1": "2e7e5da0b0a5a763fc98bed2f3308c5ad51c92d1",
+    "created_from_ref": "tasks/mig-0001-four-repo-legacy-evidence-audit",
+    "created_from_ref_head": "1196d3855355e39bafcf88b23bd87afd409938ad",
+    "start_head": "4d1531800199ec7bb80e9034199765f0eb69383a",
+    "start_head_parent": "1196d3855355e39bafcf88b23bd87afd409938ad",
+    "merge_base": "1196d3855355e39bafcf88b23bd87afd409938ad",
+    "git_ref_rechecked_utc": "2026-10-08T08:10:41Z"
+  },
+  "original_mig0001_evidence_blobs_unchanged_at_base": {
+    "migration/MIG-0001/branch-lineage.csv": "2ed63785bdc942b781775ff266ed86fa05fa6c5b",
+    "migration/MIG-0001/dependency-map.md": "da24fa39268fb5bef8adb4e3a6e83c73b1207e39",
+    "migration/MIG-0001/evidence-manifest.json": "283d382a572335b18894d5031319ccaf974debdb",
+    "migration/MIG-0001/final-report.md": "2e7e5da0b0a5a763fc98bed2f3308c5ad51c92d1",
+    "migration/MIG-0001/legacy-inventory.json": "2cea4cb57cfedd1769ad71e345bfaf00af748a2d",
+    "migration/MIG-0001/ownership-proposal.csv": "5a099bdc07931d791f3858ff232f338b3f8421d3",
+    "migration/MIG-0001/risk-register.md": "54906bcfaaebc1e79c68dbce9228eb49c4efd4e7",
+    "migration/MIG-0001/runtime-truth.md": "edebc6133e5c3b9586deeaf9bc6c7257a1d039eb",
+    "migration/MIG-0001/task-status.csv": "53dc6288954b54acc79eb38a1357de8b959f532c"
+  },
+  "host_observations": [
+    {
+      "host": "VM172",
+      "classification": "LIVE_VERIFIED",
+      "observed_at_utc": "2026-10-08T08:09:30Z",
+      "command_summary": "hostname/id/uname/os-release/ip; codex --version; process metadata without argv or environment; filtered system/user unit and timer queries; bounded marker-directory names; git worktree list and untracked-count check",
+      "normalized_output_sha256": "4f0daa81a738ee0c96b9beaed386bcd17d264062a95ca221597f3d1468275c15",
+      "codex_process_task_identity_scan": "No matching task identifiers; raw arguments were not retained.",
+      "scope_limit": "Marker search bounded to /run, /var/lib, /etc/systemd/system, /home/debian/worktrees and /home/debian/.local/state at depth 3."
+    },
+    {
+      "host": "VM179",
+      "classification": "LIVE_VERIFIED",
+      "observed_at_utc": "2026-10-08T08:09:55Z",
+      "command_summary": "strict noninteractive SSH; hostname/id/uname/os-release/ip/route; uptime/df/free; tool/unit/process/listener/repository/marker inventory",
+      "normalized_output_sha256": "6c4970d68fbf8d2fb292f5af2529e06fc3c05e46cdaec7d6478b81d736894c03",
+      "ssh_host_key": {
+        "algorithm": "ED25519",
+        "sha256": "SHA256:j7ndQORDa+Lipqh/TXA/1NlODtDzpFXpnk4X8jAPDvQ",
+        "trust_result": "Existing known_hosts key matched; public-key authentication succeeded."
+      },
+      "scope_limit": "Git repository search bounded to /home/debian, /srv and /opt at depth 4; marker search bounded to named runtime roots at depth 3."
+    },
+    {
+      "host": "VM176",
+      "classification": "GIT_REPORTED",
+      "observation_utc": "2026-10-08T07:21:19Z",
+      "source_path": "migration/MIG-0001/runtime-truth.md",
+      "source_blob_sha1": "edebc6133e5c3b9586deeaf9bc6c7257a1d039eb",
+      "current_status": "UNVERIFIED",
+      "scope_limit": "No current query was made to avoid interfering with CodexB or GPU work."
+    }
+  ],
+  "output_files": {
+    "migration/MIG-0001/delta-01/vm172-local-truth.md": {
+      "sha256": "0cde403058aaea11cd1f96797cadea1e584de1962ea858c3e622e3c8307be9f7",
+      "git_blob_sha1": "df971abe3768249089c8bfd636aa73302717ae56"
+    },
+    "migration/MIG-0001/delta-01/vm179-live-truth.md": {
+      "sha256": "e64534f167d0383c7d67bcd566962d5e801c26cbffb1225f0fe71b00977c010e",
+      "git_blob_sha1": "778756b4ee3260d4eca3faa750a2ee22215efcff"
+    },
+    "migration/MIG-0001/delta-01/controller-authority-matrix.md": {
+      "sha256": "da85fcc03b790e16cdd56f31ceaade7f4a0a88e49195871d93c285a7d7dca9d7",
+      "git_blob_sha1": "3beda6c98ae287a6b64041c28b49ce224af84a8e"
+    },
+    "migration/MIG-0001/delta-01/runtime-reconciliation.json": {
+      "sha256": "dac38e8455565c21428ef823fb964dbd2c1f645bccf109e29c1ae865c11d6bd6",
+      "git_blob_sha1": "85750c8c4944d91699f4a995402372aa329c09b2"
+    },
+    "migration/MIG-0001/delta-01/final-report.md": {
+      "sha256": "87cbdba8f141376442333a9079d4afe39426e1e9cbdec4ef513f3ca0989f02d1",
+      "git_blob_sha1": "820dab48e3295ed0efde47e950f84da6dbcdbed6"
+    }
+  },
+  "validated_files": [
+    "migration/MIG-0001/delta-01/vm172-local-truth.md",
+    "migration/MIG-0001/delta-01/vm179-live-truth.md",
+    "migration/MIG-0001/delta-01/controller-authority-matrix.md",
+    "migration/MIG-0001/delta-01/runtime-reconciliation.json",
+    "migration/MIG-0001/delta-01/final-report.md",
+    "migration/MIG-0001/delta-01/evidence-manifest.json"
+  ],
+  "manifest_integrity_note": "This file intentionally omits its own recursive SHA256 and Git blob SHA1. Its committed blob and commit are the external integrity references.",
+  "checks": {
+    "json_syntax": "PASS: evidence-manifest.json and runtime-reconciliation.json parsed with Python json.loads.",
+    "cross_references": "PASS: required six paths exist; task IDs, branch, start HEAD and evidence references agree.",
+    "changed_path_allowlist": "PASS: staged paths exactly match the six authorized delta-01 outputs.",
+    "baseline_mig0001_blobs": "PASS: all nine original MIG-0001 output blob IDs at parent commit 1196d3855355e39bafcf88b23bd87afd409938ad match the captured manifest values.",
+    "git_diff_check": "PASS: git diff --cached --check returned zero after staging only authorized outputs.",
+    "network_vm_service_gpu_mutation": "NONE_OBSERVED",
+    "software_tests_or_workloads": "NOT_RUN"
+  },
+  "commit_handoff": {
+    "expected_parent": "4d1531800199ec7bb80e9034199765f0eb69383a",
+    "guard_policy": "Create commit with this single parent; immediately recheck branch is still at expected parent; update branch with force=false only. Stop if branch advances.",
+    "end_head_and_commit_sha": "Resolved from exact branch after guarded update and recorded in final handoff.",
+    "precommit_ref_check_utc": "2026-10-08T08:16:08Z",
+    "precommit_ref_sha": "4d1531800199ec7bb80e9034199765f0eb69383a"
+  },
+  "followup_user_unit_filter": {
+    "observed_at_utc": "2026-10-08T08:15:20Z",
+    "filter": "Codex/task/relay/supervisor/holiday/dispatcher/launcher/devops/queue unit names for user services and timers",
+    "vm172_result": "No matches",
+    "vm179_result": "No matches",
+    "normalized_transcript_sha256": "e76afad796ab7da3a73aed4b00276731c47ef880d56c595f9dd104a980347af4"
+  }
+}

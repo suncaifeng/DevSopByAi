@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "task_id": "MIG-0001-RUNTIME-TRUTH-CORRECTIVE-DELTA-01-2026-10-08",
+  "result": "PARTIAL",
+  "repository": "suncaifeng/DevSopByAi",
+  "branch": "tasks/mig-0001-runtime-truth-corrective-delta-01",
+  "start_head": "4d1531800199ec7bb80e9034199765f0eb69383a",
+  "task_contract": {
+    "path": "docs/tasks/MIG-0001-RUNTIME-TRUTH-CORRECTIVE-DELTA-01-2026-10-08.md",
+    "blob_sha1": "69517ac6ee737d0e9b9c5b9056c24157c03aa8ec",
+    "parent_task_path": "docs/tasks/MIG-0001-FOUR-REPO-LEGACY-EVIDENCE-AUDIT-2026-10-08.md",
+    "parent_task_blob_sha1": "337d963d62988c084809c082bca48a47c4faa66a",
+    "parent_report_path": "migration/MIG-0001/final-report.md",
+    "parent_report_blob_sha1": "2e7e5da0b0a5a763fc98bed2f3308c5ad51c92d1"
+  },
+  "lineage": {
+    "created_from_ref": "tasks/mig-0001-four-repo-legacy-evidence-audit",
+    "created_from_ref_head": "1196d3855355e39bafcf88b23bd87afd409938ad",
+    "fork_start_head": "4d1531800199ec7bb80e9034199765f0eb69383a",
+    "fork_direct_parent": "1196d3855355e39bafcf88b23bd87afd409938ad",
+    "merge_base": "1196d3855355e39bafcf88b23bd87afd409938ad",
+    "observed_ref_confirmation_utc": "2026-10-08T08:10:41Z",
+    "status": "VERIFIED"
+  },
+  "observations": [
+    {
+      "host": "VM172",
+      "classification": "LIVE_VERIFIED",
+      "observed_at_utc": "2026-10-08T08:09:30Z",
+      "identity": {
+        "hostname": "ai-control",
+        "ip": "10.145.45.72/25",
+        "user": "debian",
+        "os": "Debian GNU/Linux 13 (trixie)",
+        "kernel": "6.12.107+deb13-amd64",
+        "codex_cli": "0.155.1",
+        "codex_cli_wrapper_sha256": "61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70"
+      },
+      "transcript_sha256": "4f0daa81a738ee0c96b9beaed386bcd17d264062a95ca221597f3d1468275c15",
+      "findings": [
+        "Three active codex/codex-code-mode process pairs were observed; a filtered argv scan found no task identity.",
+        "No matching system/user Supervisor, relay, dispatcher, launcher or timer units were found.",
+        "Explicit vm172-supervisor, vm172-codexc-relay-supervisor and codex-task-supervisor probes returned LoadState=not-found.",
+        "No matching durable marker directories were found within the bounded inspected roots.",
+        "The pre-existing /srv/devsop main checkout had 68 untracked paths and was left untouched; the task used a separate clean clone."
+      ],
+      "dispatch_authority": "UNVERIFIED"
+    },
+    {
+      "host": "VM179",
+      "classification": "LIVE_VERIFIED",
+      "observed_at_utc": "2026-10-08T08:09:55Z",
+      "identity": {
+        "hostname": "devops",
+        "ip": "10.145.45.79/25",
+        "user": "debian",
+        "os": "Debian GNU/Linux 13 (trixie)",
+        "kernel": "6.12.107+deb13-amd64",
+        "ssh_host_key_algorithm": "ED25519",
+        "ssh_host_key_sha256": "SHA256:j7ndQORDa+Lipqh/TXA/1NlODtDzpFXpnk4X8jAPDvQ",
+        "ssh_authentication": "existing trusted public key"
+      },
+      "transcript_sha256": "6c4970d68fbf8d2fb292f5af2529e06fc3c05e46cdaec7d6478b81d736894c03",
+      "findings": [
+        "SSH strict noninteractive login succeeded and host identity matched existing known_hosts.",
+        "Codex, node, npm and uv were not found; git, python3 and systemctl were available.",
+        "No matching task service, timer, worker, dispatcher, launcher, listener or marker directory was observed.",
+        "The only Git repository in bounded search roots was unrelated android-usage-recorder on main at fe1e9ab33515f96f4f337e379f6be982c3036d9f."
+      ],
+      "dispatch_authority": "NO_ACTIVE_DEVOPS_DISPATCHER_OBSERVED"
+    },
+    {
+      "host": "VM176",
+      "classification": "GIT_REPORTED",
+      "observed_at_utc": "2026-10-08T07:21:19Z",
+      "source_path": "migration/MIG-0001/runtime-truth.md",
+      "source_blob_sha1": "edebc6133e5c3b9586deeaf9bc6c7257a1d039eb",
+      "findings": [
+        "The preserved snapshot reported vm176-holiday-relay disabled/inactive, launch suppressed, and no CodexB intent/launched marker at the observation time.",
+        "The preserved snapshot reported ai-comfyui as GPU owner; the thermal preflight report later self-reported BLOCKED before workload/power changes.",
+        "Current VM176 state was not queried to avoid interfering with CodexB or GPU work."
+      ],
+      "current_status": "UNVERIFIED"
+    }
+  ],
+  "controller_authority": {
+    "vm172_control_plane": "USER_REPORTED_ROLE; local Codex host LIVE_VERIFIED; durable dispatch authority UNVERIFIED",
+    "vm179_devops_execution": "USER_REPORTED_ROLE; guest LIVE_VERIFIED; no active Codex/DevOps task dispatcher observed",
+    "vm176_gpu_runtime": "USER_REPORTED_ROLE; historical snapshot only; current owner and lease UNVERIFIED",
+    "single_controller_fencing": "OPEN_BLOCKER",
+    "recommendation": "Keep MIG-0002 DESIGN_ONLY; require independent review, explicit controller identity and fencing, fresh marker/lease verification, and separate immutable authorization."
+  },
+  "acceptance": {
+    "AC01": "PASS",
+    "AC02": "PASS",
+    "AC03": "PARTIAL: runtime characterized; task identity and dispatch authority of existing VM172 Codex sessions remain unknown",
+    "AC04": "PASS: VM179 fresh trusted live inspection completed",
+    "AC05": "PARTIAL: VM176 preserved evidence reviewed without interference; current state intentionally unverified",
+    "AC06": "PASS: no unsupported no-duplicate claim; fencing recommendation explicit",
+    "AC07": "PASS",
+    "AC08": "PASS: six authorized paths only; all nine baseline MIG-0001 evidence blobs unchanged.",
+    "AC09": "PASS: JSON syntax, cross-references, allowlist, baseline blobs and git diff --check validated; exact end commit supplied by final Git handoff.",
+    "AC10": "PASS: design-only recommendation; no MIG-0002 or workload launched"
+  },
+  "known_gaps": [
+    "VM172 active Codex session task identities and actual dispatch authority are unknown.",
+    "VM176 current relay, GPU lease, workload, and CodexB test status were not independently queried.",
+    "No fresh proof establishes a single fenced controller across VM172, VM179 and VM176."
+  ]
+}
