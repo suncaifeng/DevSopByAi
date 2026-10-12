@@ -31,3 +31,15 @@ In substantial proposals or new TaskContract Layer A, include a compact `DECISIO
 **GPT planner/reviewer:** criticizes strategic path before TaskContract freeze and audits outcomes afterwards. **Codex/agy executor:** reads this file before execution, follows the authorized frozen task, logs a witnessed `STRATEGY_RISK` and proposes follow-up if needed; does not silently replan, change tests, abort legitimate work for preference reasons, or self-approve merge. **User:** final strategic choice and existing production/merge approval.
 
 This rule is Git-only, not a service, Supervisor, AI Memory, remote blocking hook, or new safety fuse. It neither unfreezes DevSopByAi nor modifies established `KM-001`, historical evidence, training plans, or any other project SSOT. Repo docs are **not automatically loaded by ChatGPT**; whoever proposes/executes must actually read them.
+
+---
+
+## 2026-10-12 addition — Smallest verifiable MVP closure before polish
+
+**Outcome first, then optimize.** Before proposing a major framework comparison, UI/architecture expansion, migration or long benchmark, identify the **smallest end-to-end user-visible artifact or successful real transaction** the current task can finish and demonstrate. Ship that reproducibly and independently verify it before broadening the work. Pure implementation progress, PRs, “model loaded” and synthetic scores are **not** equivalent to an accepted MVP.
+
+The VM176/VM76 scope is **three independent project domains**, not one monolithic release: [gpu-compute](https://github.com/suncaifeng/gpu-compute) owns GPU control and shared V100 arbitration; [llm-inference](https://github.com/suncaifeng/llm-inference) owns local LLM serving / Coding Agent; [video-generation](https://github.com/suncaifeng/video-generation) owns H3/LTX/ComfyUI video creation. Original [comfyui-minimax-h3](https://github.com/suncaifeng/comfyui-minimax-h3) is historical source; [DevSopByAi](https://github.com/suncaifeng/DevSopByAi) is reserved/frozen. **Do not let one domain wait for the others to complete all feature upgrades**; only the real minimal interface and existing authorized GPU-owner rules are shared.
+
+**Read the current cross-project MVP mind** before planning or executing VM176-related tasks: [VM176 Three-Project Minimum MVP Closure](https://github.com/suncaifeng/gpu-compute/blob/c04a5bda11b8dad8914e1b058bec45d3b72c5a58/docs/mind/DevSopByAi/VM176-THREE-PROJECT-MVP-CLOSURE-2026-10-12.md). In a new strategic proposal identify `MVP_OUTPUT` (artifact/transaction), `MINIMUM_ACCEPTANCE` (real end-to-end proof), `EXCLUDE_UNTIL_LATER` (optional optimization), and `DEPENDENCY_MINIMUM` (only needed cross-project contract); record `UNKNOWN` where no evidence exists. **For routine tasks and already approved frozen tasks, this is not a new gate or a license to alter the contract.** Any mismatch is advice/evidence for a subsequent task, not a reason to self-stop authorized work.
+
+**MVP means minimal scope, not lower security, hardware safety, quality or review standards.**
